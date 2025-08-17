@@ -1,0 +1,680 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		851D54582E253CC80076368A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 851D54572E253CC80076368A /* GoogleSignIn */; };
+		851D545A2E253CC80076368A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 851D54592E253CC80076368A /* GoogleSignInSwift */; };
+		854180F62E40F1C700269198 /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 854180F52E40F1C700269198 /* GoogleGenerativeAI */; };
+		85506C262E23BCC500ED607C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 85506C252E23BCC500ED607C /* FirebaseAnalytics */; };
+		85506C292E23C1E600ED607C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 85506C282E23C1E600ED607C /* FirebaseAuth */; };
+		85937FC02E3BAA6A00366299 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 85937FBF2E3BAA6A00366299 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		85506C062E23B68300ED607C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85506BF02E23B68100ED607C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85506BF72E23B68100ED607C;
+			remoteInfo = FynVerse;
+		};
+		85506C102E23B68300ED607C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85506BF02E23B68100ED607C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85506BF72E23B68100ED607C;
+			remoteInfo = FynVerse;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		85506BF82E23B68100ED607C /* FynVerse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FynVerse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		85506C052E23B68300ED607C /* FynVerseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FynVerseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		85506C0F2E23B68300ED607C /* FynVerseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FynVerseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		855845282E25485300E846BC /* Exceptions for "FynVerse" folder in "FynVerse" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 85506BF72E23B68100ED607C /* FynVerse */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		85506BFA2E23B68100ED607C /* FynVerse */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				855845282E25485300E846BC /* Exceptions for "FynVerse" folder in "FynVerse" target */,
+			);
+			path = FynVerse;
+			sourceTree = "<group>";
+		};
+		85506C082E23B68300ED607C /* FynVerseTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FynVerseTests;
+			sourceTree = "<group>";
+		};
+		85506C122E23B68300ED607C /* FynVerseUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FynVerseUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		85506BF52E23B68100ED607C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85506C262E23BCC500ED607C /* FirebaseAnalytics in Frameworks */,
+				85506C292E23C1E600ED607C /* FirebaseAuth in Frameworks */,
+				851D54582E253CC80076368A /* GoogleSignIn in Frameworks */,
+				854180F62E40F1C700269198 /* GoogleGenerativeAI in Frameworks */,
+				851D545A2E253CC80076368A /* GoogleSignInSwift in Frameworks */,
+				85937FC02E3BAA6A00366299 /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85506C022E23B68300ED607C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85506C0C2E23B68300ED607C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		85506BEF2E23B68100ED607C = {
+			isa = PBXGroup;
+			children = (
+				85506BFA2E23B68100ED607C /* FynVerse */,
+				85506C082E23B68300ED607C /* FynVerseTests */,
+				85506C122E23B68300ED607C /* FynVerseUITests */,
+				85506C272E23C1E600ED607C /* Frameworks */,
+				85506BF92E23B68100ED607C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		85506BF92E23B68100ED607C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				85506BF82E23B68100ED607C /* FynVerse.app */,
+				85506C052E23B68300ED607C /* FynVerseTests.xctest */,
+				85506C0F2E23B68300ED607C /* FynVerseUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		85506C272E23C1E600ED607C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		85506BF72E23B68100ED607C /* FynVerse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85506C192E23B68300ED607C /* Build configuration list for PBXNativeTarget "FynVerse" */;
+			buildPhases = (
+				85506BF42E23B68100ED607C /* Sources */,
+				85506BF52E23B68100ED607C /* Frameworks */,
+				85506BF62E23B68100ED607C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				85506BFA2E23B68100ED607C /* FynVerse */,
+			);
+			name = FynVerse;
+			packageProductDependencies = (
+				85506C252E23BCC500ED607C /* FirebaseAnalytics */,
+				85506C282E23C1E600ED607C /* FirebaseAuth */,
+				851D54572E253CC80076368A /* GoogleSignIn */,
+				851D54592E253CC80076368A /* GoogleSignInSwift */,
+				85937FBF2E3BAA6A00366299 /* FirebaseFirestore */,
+				854180F52E40F1C700269198 /* GoogleGenerativeAI */,
+			);
+			productName = FynVerse;
+			productReference = 85506BF82E23B68100ED607C /* FynVerse.app */;
+			productType = "com.apple.product-type.application";
+		};
+		85506C042E23B68300ED607C /* FynVerseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85506C1C2E23B68300ED607C /* Build configuration list for PBXNativeTarget "FynVerseTests" */;
+			buildPhases = (
+				85506C012E23B68300ED607C /* Sources */,
+				85506C022E23B68300ED607C /* Frameworks */,
+				85506C032E23B68300ED607C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85506C072E23B68300ED607C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				85506C082E23B68300ED607C /* FynVerseTests */,
+			);
+			name = FynVerseTests;
+			packageProductDependencies = (
+			);
+			productName = FynVerseTests;
+			productReference = 85506C052E23B68300ED607C /* FynVerseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		85506C0E2E23B68300ED607C /* FynVerseUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85506C1F2E23B68300ED607C /* Build configuration list for PBXNativeTarget "FynVerseUITests" */;
+			buildPhases = (
+				85506C0B2E23B68300ED607C /* Sources */,
+				85506C0C2E23B68300ED607C /* Frameworks */,
+				85506C0D2E23B68300ED607C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85506C112E23B68300ED607C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				85506C122E23B68300ED607C /* FynVerseUITests */,
+			);
+			name = FynVerseUITests;
+			packageProductDependencies = (
+			);
+			productName = FynVerseUITests;
+			productReference = 85506C0F2E23B68300ED607C /* FynVerseUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		85506BF02E23B68100ED607C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					85506BF72E23B68100ED607C = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					85506C042E23B68300ED607C = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 85506BF72E23B68100ED607C;
+					};
+					85506C0E2E23B68300ED607C = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 85506BF72E23B68100ED607C;
+					};
+				};
+			};
+			buildConfigurationList = 85506BF32E23B68100ED607C /* Build configuration list for PBXProject "FynVerse" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 85506BEF2E23B68100ED607C;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				85506C242E23BCC500ED607C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				851D54562E253CC80076368A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				854180F42E40F1C700269198 /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 85506BF92E23B68100ED607C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				85506BF72E23B68100ED607C /* FynVerse */,
+				85506C042E23B68300ED607C /* FynVerseTests */,
+				85506C0E2E23B68300ED607C /* FynVerseUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		85506BF62E23B68100ED607C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85506C032E23B68300ED607C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85506C0D2E23B68300ED607C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		85506BF42E23B68100ED607C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85506C012E23B68300ED607C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85506C0B2E23B68300ED607C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		85506C072E23B68300ED607C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85506BF72E23B68100ED607C /* FynVerse */;
+			targetProxy = 85506C062E23B68300ED607C /* PBXContainerItemProxy */;
+		};
+		85506C112E23B68300ED607C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85506BF72E23B68100ED607C /* FynVerse */;
+			targetProxy = 85506C102E23B68300ED607C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		85506C172E23B68300ED607C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		85506C182E23B68300ED607C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		85506C1A2E23B68300ED607C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FynVerse/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FynVerse;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.FynVerse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		85506C1B2E23B68300ED607C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FynVerse/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FynVerse;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.FynVerse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		85506C1D2E23B68300ED607C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.FynVerseTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FynVerse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FynVerse";
+			};
+			name = Debug;
+		};
+		85506C1E2E23B68300ED607C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.FynVerseTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FynVerse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FynVerse";
+			};
+			name = Release;
+		};
+		85506C202E23B68300ED607C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.FynVerseUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FynVerse;
+			};
+			name = Debug;
+		};
+		85506C212E23B68300ED607C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4ZJ6BWAJY6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.FynVerseUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FynVerse;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		85506BF32E23B68100ED607C /* Build configuration list for PBXProject "FynVerse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85506C172E23B68300ED607C /* Debug */,
+				85506C182E23B68300ED607C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85506C192E23B68300ED607C /* Build configuration list for PBXNativeTarget "FynVerse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85506C1A2E23B68300ED607C /* Debug */,
+				85506C1B2E23B68300ED607C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85506C1C2E23B68300ED607C /* Build configuration list for PBXNativeTarget "FynVerseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85506C1D2E23B68300ED607C /* Debug */,
+				85506C1E2E23B68300ED607C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85506C1F2E23B68300ED607C /* Build configuration list for PBXNativeTarget "FynVerseUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85506C202E23B68300ED607C /* Debug */,
+				85506C212E23B68300ED607C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		851D54562E253CC80076368A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+		854180F42E40F1C700269198 /* XCRemoteSwiftPackageReference "generative-ai-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/generative-ai-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.6;
+			};
+		};
+		85506C242E23BCC500ED607C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.15.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		851D54572E253CC80076368A /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 851D54562E253CC80076368A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		851D54592E253CC80076368A /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 851D54562E253CC80076368A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		854180F52E40F1C700269198 /* GoogleGenerativeAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 854180F42E40F1C700269198 /* XCRemoteSwiftPackageReference "generative-ai-swift" */;
+			productName = GoogleGenerativeAI;
+		};
+		85506C252E23BCC500ED607C /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 85506C242E23BCC500ED607C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		85506C282E23C1E600ED607C /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 85506C242E23BCC500ED607C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		85937FBF2E3BAA6A00366299 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 85506C242E23BCC500ED607C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 85506BF02E23B68100ED607C /* Project object */;
+}

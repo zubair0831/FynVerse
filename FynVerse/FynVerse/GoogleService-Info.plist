@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>554081437113-m67ui40s30lh5t8601smnqeainf5rmtq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.554081437113-m67ui40s30lh5t8601smnqeainf5rmtq</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB6g84b3UKYGQqGniaoggfDZAzSYnbIIek</string>
+	<key>GCM_SENDER_ID</key>
+	<string>554081437113</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.app.FynVerse</string>
+	<key>PROJECT_ID</key>
+	<string>fynverseapp</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fynverseapp.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:554081437113:ios:4927d8209063e074f0e268</string>
+</dict>
+</plist>
