@@ -7,7 +7,7 @@
 
 
 struct Next5Dpred: Codable {
-    let date: String
+    let date: String?
     let probability: Double
     let signal: String
 }

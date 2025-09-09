@@ -53,13 +53,12 @@ struct WatchlistCardView: View {
                         ? watchlist.stockSymbols
                         : Array(watchlist.stockSymbols.prefix(5))
                     
-                    ForEach(symbolsToShow, id: \.self) { symbol in
+                    // Fixed ForEach - explicitly specify String type
+                    ForEach(symbolsToShow, id: \.self) { (symbol: String) in
                         if let stock = vm.returnStockModel(symbol: symbol) {
-                            NavigationLink {
-                                DetailView(stock: stock, DBStock: nil, authViewModel: authvm)
-                            } label: {
-                                StockRowView(stock: stock, portfolioStock: nil)
-                            }
+                            
+                                StockRowView(stock: stock, authvm: authvm)
+                            
                             .buttonStyle(.plain)
                         } else {
                             Text("\(symbol) - Data not available")
@@ -92,7 +91,7 @@ struct WatchlistCardView: View {
         )
         .padding(.horizontal)
         .sheet(isPresented: $showAddStockSheet) {
-            AddStockToWatchlistSheet(watchlist: watchlist)
+            AddStockToWatchlistSheet(authvm: authvm, watchlist: watchlist)
         }
     }
 }

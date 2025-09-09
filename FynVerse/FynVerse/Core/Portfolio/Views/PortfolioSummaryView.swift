@@ -1,7 +1,15 @@
+//
+//  PortfolioSummaryView.swift
+//  FynVerse
+//
+//  Created by zubair ahmed on 08/09/25.
+//
+
 import SwiftUI
 
+
 struct PortfolioSummaryView: View {
-    @EnvironmentObject var vm: HomeViewModel
+    @EnvironmentObject var vm: PortfolioViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) { // Increased spacing for a cleaner look

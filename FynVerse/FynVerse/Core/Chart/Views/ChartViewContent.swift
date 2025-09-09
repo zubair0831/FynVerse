@@ -146,11 +146,25 @@ struct ChartViewContent: View {
         if selectedRange == .oneDay {
             let calendar = Calendar.current
             let now = Date()
+            // Market open at 9:15 AM today
             guard let marketOpen = calendar.date(bySettingHour: 9, minute: 15, second: 0, of: now) else {
                 return now...now
             }
-            return marketOpen...now
+            // Ensure lowerBound <= upperBound
+            if now < marketOpen {
+                return now...now
+            } else {
+                return marketOpen...now
+            }
+        } else {
+            // Safely get first and last dates from data
+            guard let firstDate = data.first?.date,
+                  let lastDate = data.last?.date else {
+                let now = Date()
+                return now...now
+            }
+            return min(firstDate, lastDate)...max(firstDate, lastDate)
         }
-        return (data.first?.date ?? Date())...(data.last?.date ?? Date())
     }
+
 }

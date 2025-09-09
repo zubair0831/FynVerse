@@ -3,18 +3,33 @@ import SwiftUI
 struct SeeMoreButton: View {
     let resultantStocks: [StockModel]
     let title: String
-    @ObservedObject var authvm:AuthViewModel
-
+    let authvm: AuthViewModel
+    var marketCapFilter: MarketCapFilter? = nil
+    
+    enum MarketCapFilter: String, CaseIterable {
+        case largeCap = "Large Cap"
+        case midCap = "Mid Cap"
+        case smallCap = "Small Cap"
+    }
+    
     var body: some View {
-        NavigationLink {
-            SeeMoreView(resultantStocks: resultantStocks, title: title, vm: authvm)
-        } label: {
+        NavigationLink(
+            destination: SeeMoreStocksView(
+                stocks: resultantStocks,
+                title: title,
+                authvm: authvm,
+                marketCapFilter: marketCapFilter
+            )
+        ) {
             HStack(spacing: 4) {
-                Text("See All")
+                Text("See More")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
                 Image(systemName: "chevron.right")
+                    .font(.caption)
             }
-            .font(.subheadline)
+            .foregroundStyle(Color.theme.accent)
         }
-        .buttonStyle(.plain) // Make sure it doesn't have a default style
+        .buttonStyle(.plain)
     }
 }

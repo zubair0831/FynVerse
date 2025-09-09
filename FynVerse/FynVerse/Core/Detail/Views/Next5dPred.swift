@@ -3,7 +3,6 @@ import SwiftUI
 struct Next5DPredictionView: View {
     let stockSymbol: String
     let prediction: Next5Dpred?
-    let longPred: lonShortPred?
     let isLoading: Bool
     let animateSpinner: Bool
 
@@ -27,18 +26,6 @@ struct Next5DPredictionView: View {
                     // Main 3 Bars
                     PredictionBar(title: "Next 5D", percentage: animatedNext5D, color: .green)
                     
-                    if let _ = longPred {
-                        PredictionBar(title: "Short-Term", percentage: animatedShort, color: .orange)
-                        PredictionBar(title: "Long-Term", percentage: animatedLong, color: .blue)
-                        
-                        Divider().padding(.vertical, 4)
-                        
-                        // Smaller supporting bars
-                        PredictionBar(title: "Fundamental", percentage: animatedFundamental, color: .purple)
-                            .scaleEffect(y: 0.8, anchor: .center)
-                        PredictionBar(title: "Technical", percentage: animatedTechnical, color: .pink)
-                            .scaleEffect(y: 0.8, anchor: .center)
-                    }
                     
                     Text(prediction.signal.uppercased())
                         .font(.subheadline.bold())
@@ -62,12 +49,6 @@ struct Next5DPredictionView: View {
                 .padding(.horizontal)
                 .onAppear {
                     animatedNext5D = prediction.probability * 100
-                    if let lp = longPred {
-                        animatedShort = lp.shortTermScore01 * 100
-                        animatedLong = lp.longTermScore01 * 100
-                        animatedFundamental = lp.fundamentalScore01 * 100
-                        animatedTechnical = lp.technicalScore01 * 100
-                    }
                 }
             } else {
                 Text("Failed to load prediction.")

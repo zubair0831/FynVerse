@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
+
 def compute_features(df):
+    print("✅ Using Backend/computefeatures.py")
+
     df = df.copy()
     df = df[['Open','High','Low','Close','Volume']].astype(float)
 
@@ -15,9 +18,11 @@ def compute_features(df):
     df['ma_5'] = df['Close'].rolling(5).mean()
     df['ma_10'] = df['Close'].rolling(10).mean()
     df['ma_20'] = df['Close'].rolling(20).mean()
-    df['ma_5_ratio'] = df['Close'] / df['ma_5'] - 1
-    df['ma_10_ratio'] = df['Close'] / df['ma_10'] - 1
-    df['ma_20_ratio'] = df['Close'] / df['ma_20'] - 1
+    
+    # Fix: Use .values or ensure single column assignment
+    df['ma_5_ratio'] = (df['Close'] / df['ma_5'] - 1).values
+    df['ma_10_ratio'] = (df['Close'] / df['ma_10'] - 1).values
+    df['ma_20_ratio'] = (df['Close'] / df['ma_20'] - 1).values
     df['ma_crossover_5_10'] = (df['ma_5'] > df['ma_10']).astype(int)
 
     # Bollinger band position
@@ -26,14 +31,22 @@ def compute_features(df):
     sma20 = rolling20.mean()
     df['bb_upper'] = sma20 + 2*std20
     df['bb_lower'] = sma20 - 2*std20
-    df['bb_pos'] = (df['Close'] - df['bb_lower']) / (df['bb_upper'] - df['bb_lower'])
+    
+    # Fix: Ensure proper calculation and single column assignment
+    bb_range = df['bb_upper'] - df['bb_lower']
+    df['bb_pos'] = ((df['Close'] - df['bb_lower']) / bb_range).fillna(0.5)
 
-    # RSI
+    # RSI - Fix the calculation
     df['delta'] = df['Close'].diff()
     gain = df['delta'].where(df['delta'] > 0, 0)
     loss = -df['delta'].where(df['delta'] < 0, 0)
-    df['rsi_14'] = gain.rolling(14).mean() / (gain.rolling(14).mean() + loss.rolling(14).mean())
-    df['rsi_14'] = 100 - (100 / (1 + (gain.rolling(14).mean() / (loss.rolling(14).mean() + 1e-9))))
+    
+    # Use exponential moving average for RSI (more standard)
+    avg_gain = gain.ewm(span=14, adjust=False).mean()
+    avg_loss = loss.ewm(span=14, adjust=False).mean()
+    rs = avg_gain / (avg_loss + 1e-9)
+    df['rsi_14'] = 100 - (100 / (1 + rs))
+    
     # MACD
     ema12 = df['Close'].ewm(span=12, adjust=False).mean()
     ema26 = df['Close'].ewm(span=26, adjust=False).mean()
@@ -44,20 +57,29 @@ def compute_features(df):
     # Volume features
     df['vol_avg_10'] = df['Volume'].rolling(10).mean()
     df['vol_spike_ratio'] = df['Volume'] / (df['vol_avg_10'] + 1e-9)
-    # OBV
-    df['obv'] = (np.sign(df['Close'].diff()) * df['Volume']).fillna(0).cumsum()
+    
+    # OBV - Fix the calculation
+    price_change_sign = np.sign(df['Close'].diff()).fillna(0)
+    df['obv'] = (price_change_sign * df['Volume']).cumsum()
     df['obv_change_5d'] = df['obv'] - df['obv'].shift(5)
 
     # Volatility
     df['daily_range'] = (df['High'] - df['Low']) / df['Close']
+    
+    # True Range calculation
+    prev_close = df['Close'].shift(1)
     tr1 = df['High'] - df['Low']
-    tr2 = (df['High'] - df['Close'].shift()).abs()
-    tr3 = (df['Low'] - df['Close'].shift()).abs()
-    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-    df['atr_14'] = tr.rolling(14).mean()
-
-    # Market context placeholders (user can compute & merge NIFTY externally)
-    # Example: df['nifty_rel_3d'] = df['return_3d'] - nifty_return_3d
+    tr2 = (df['High'] - prev_close).abs()
+    tr3 = (df['Low'] - prev_close).abs()
+    
+    # Fix: Use pd.DataFrame constructor instead of concat for max operation
+    true_range = pd.DataFrame({
+        'tr1': tr1,
+        'tr2': tr2,
+        'tr3': tr3
+    }).max(axis=1)
+    
+    df['atr_14'] = true_range.rolling(14).mean()
 
     # target: up in 5 trading days
     df['target'] = (df['Close'].shift(-5) > df['Close']).astype(int)
@@ -70,10 +92,27 @@ def compute_features(df):
         'rsi_14','macd_hist','vol_spike_ratio','obv_change_5d','atr_14','daily_range',
         'target'
     ]
-    df = df[keep]
-    df = df.dropna()
-    return df
-
+    
+    # Ensure all columns exist before selection
+    available_cols = [col for col in keep if col in df.columns]
+    missing_cols = [col for col in keep if col not in df.columns]
+    
+    if missing_cols:
+        print(f"Warning: Missing columns: {missing_cols}")
+    
+    df = df[available_cols]
+    
+    
+    # Drop rows with NaN values
+    df_clean = df.dropna()
+    
+    print(f"DataFrame shape after dropna: {df_clean.shape}")
+    
+    # Ensure we have at least some data
+    if df_clean.empty:
+        raise ValueError("No valid data remaining after feature computation and NaN removal")
+    
+    return df_clean
 # Requires: yfinance, pandas, numpy, scipy
 
 # pip install yfinance pandas numpy scipy

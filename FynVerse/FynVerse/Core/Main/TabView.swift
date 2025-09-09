@@ -3,13 +3,14 @@ import SwiftUI
 struct MainTabView: View {
     @EnvironmentObject var vm: HomeViewModel
     @ObservedObject var authvm: AuthViewModel
+    @ObservedObject var Pvm: PortfolioViewModel
     var body: some View {
         NavigationStack {
             TabView {
                 HomeView(authvm: authvm)
                     .tabItem { Label("Explore", systemImage: "globe") }
 
-                PortfolioView( authvm: authvm)
+                PortfolioView( vm: Pvm, authvm: authvm)
                     .tabItem { Label("My Portfolio", systemImage: "briefcase.circle.fill") }
 
                 ProfileView()

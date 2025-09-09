@@ -17,7 +17,7 @@ import Foundation
 struct StockPredictionService {
     
     static func fetchNext5D(stockSymbol: String) async -> Next5Dpred? {
-        let urlString = "http://192.168.1.30:8000/prediction5d?ticker=\(stockSymbol).NS"
+        let urlString = "http://localhost:8000/prediction5d?ticker=\(stockSymbol).NS"
         guard let url = URL(string: urlString) else { return nil }
         
         do {
@@ -29,17 +29,6 @@ struct StockPredictionService {
         }
     }
     
-    static func fetchLongShort(stockSymbol: String) async -> lonShortPred? {
-        let urlString = "http://192.168.1.30:8000/shortlongterm?ticker=\(stockSymbol).NS"
-        guard let url = URL(string: urlString) else { return nil }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            return try JSONDecoder().decode(lonShortPred.self, from: data)
-        } catch {
-            print("❌ Failed to fetch long/short prediction:", error)
-            return nil
-        }
-    }
+    
 }
 

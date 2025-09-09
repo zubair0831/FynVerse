@@ -3,7 +3,7 @@ import SwiftUI
 struct AddStockToWatchlistSheet: View {
     @EnvironmentObject var vm: HomeViewModel
     @Environment(\.dismiss) var dismiss
-    
+    @ObservedObject var authvm: AuthViewModel
     let watchlist: UserWatchlist
     @State private var searchText: String = ""
     
@@ -38,7 +38,7 @@ struct AddStockToWatchlistSheet: View {
                                         dismiss()
                                     }
                                 } label: {
-                                    StockRowView(stock: stock, portfolioStock: nil)
+                                    StockRowView(stock: stock, authvm: authvm)
                                 }
                                 .buttonStyle(.plain)
                             }

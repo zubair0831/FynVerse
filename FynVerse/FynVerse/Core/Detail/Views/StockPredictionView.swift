@@ -24,18 +24,6 @@ struct StockPredictionView: View {
                     // Main bars
                     PredictionBar(title: "Next 5D", percentage: animatedNext5D, color: .green)
                     
-                    if let _ = vm.longShortPrediction {
-                        PredictionBar(title: "Short-Term", percentage: animatedShort, color: .orange)
-                        PredictionBar(title: "Long-Term", percentage: animatedLong, color: .blue)
-                        
-                        Divider().padding(.vertical, 4)
-                        
-                        // Smaller bars
-                        PredictionBar(title: "Fundamental", percentage: animatedFundamental, color: .purple)
-                            .scaleEffect(y: 0.8, anchor: .center)
-                        PredictionBar(title: "Technical", percentage: animatedTechnical, color: .pink)
-                            .scaleEffect(y: 0.8, anchor: .center)
-                    }
                     
                     Text(prediction.signal.uppercased())
                         .font(.subheadline.bold())
@@ -60,12 +48,7 @@ struct StockPredictionView: View {
                 .onAppear {
                     withAnimation(.easeOut(duration: 1.2)) {
                         animatedNext5D = prediction.probability * 100
-                        if let lp = vm.longShortPrediction {
-                            animatedShort = lp.shortTermScore01 * 100
-                            animatedLong = lp.longTermScore01 * 100
-                            animatedFundamental = lp.fundamentalScore01 * 100
-                            animatedTechnical = lp.technicalScore01 * 100
-                        }
+                        
                     }
                 }
             } else {

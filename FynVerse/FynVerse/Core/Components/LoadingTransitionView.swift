@@ -3,10 +3,11 @@ import SwiftUI
 struct LoadingTransitionView: View {
     @State private var isActive = false
     @ObservedObject var authvm: AuthViewModel
+    @ObservedObject var Pvm: PortfolioViewModel
     
     var body: some View {
         if isActive {
-            MainTabView( authvm: authvm) // Your main app view
+            MainTabView( authvm: authvm, Pvm: Pvm) // Your main app view
         } else {
             VStack {
                 Spacer()

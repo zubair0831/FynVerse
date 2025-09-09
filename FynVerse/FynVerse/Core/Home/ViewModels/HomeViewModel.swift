@@ -1,4 +1,5 @@
 import Foundation
+
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var allStocks: [StockModel] = []
@@ -6,22 +7,20 @@ class HomeViewModel: ObservableObject {
     @Published var topLooserStocks: [StockModel] = []
     @Published var searchText: String = "" { didSet { filterStocks() } }
     @Published var filteredStocks: [StockModel] = []
-    @Published var portfolioStocks: [DBPortfolioStock] = []
     @Published var userWatchlists: [UserWatchlist] = []
-    
-    @Published var totalInvestment: Double = 0
-    @Published var portfolioValue: Double = 0
-    @Published var totalGainLoss: Double = 0
+
+    // Market Cap filtered stocks
+    @Published var largeCapStocks: [StockModel] = []
+    @Published var midCapStocks: [StockModel] = []
+    @Published var smallCapStocks: [StockModel] = []
     
     @Published var authViewModel: AuthViewModel
     @Published var selectedTab = 0
     
     @Published var dataInitializedForHome: Bool = false
-    @Published var dataInitializedForPortfolio: Bool = false
     @Published var dataInitializedForWatchlists: Bool = false
     
     private let manager = StockDataService.shared
-    private let portfolioService = PortfolioService()
     private let watchlistService = WatchlistService()
     
     init(authViewModel: AuthViewModel) {
@@ -32,35 +31,21 @@ class HomeViewModel: ObservableObject {
     func fetchStocks() async {
         let cached = StockCacheService.loadStocksFromCache()
         if !cached.isEmpty {
-            allStocks = cached
+            allStocks = cached.sorted { $0.MarketCap > $1.MarketCap }
             applyFilters()
             print("✅ Showing cached stocks...")
         }
         
         let fetched = await manager.fetchStocks()
         if !fetched.isEmpty {
-            allStocks = fetched
+            allStocks = fetched.sorted { $0.MarketCap > $1.MarketCap }
             StockCacheService.saveStocksToCache(fetched)
             print("✅ Stocks fetched from API.")
         }
         
         applyFilters()
     }
-    
-    // MARK: - Portfolio
-    func fetchPortfolioStocks() async {
-        guard let user = authViewModel.user else { return }
-        do {
-            portfolioStocks = try await portfolioService.fetchPortfolioStocks(for: user.userID)
-            let summary = portfolioService.calculatePortfolioSummary(portfolioStocks: portfolioStocks, allStocks: allStocks)
-            totalInvestment = summary.investment
-            portfolioValue = summary.value
-            totalGainLoss = summary.gainLoss
-        } catch {
-            print("❌ Portfolio fetch error:", error.localizedDescription)
-        }
-    }
-    
+
     // MARK: - Watchlists
     func fetchUserWatchlists() async {
         guard let user = authViewModel.user else { return }
@@ -139,13 +124,23 @@ class HomeViewModel: ObservableObject {
             .sorted { $0.Percent_Change < $1.Percent_Change }
     }
     
+    // MARK: - Market Cap Filters
+    func filterByMarketCap() {
+        let sortedStocks = allStocks.sorted { $0.MarketCap > $1.MarketCap }
+        largeCapStocks = Array(sortedStocks.prefix(100))
+        midCapStocks = Array(sortedStocks.dropFirst(100).prefix(250))
+        smallCapStocks = Array(sortedStocks.dropFirst(350))
+    }
+    
     private func applyFilters() {
         filterStocks()
         filterGainerStocks()
         filterLooserStocks()
+        filterByMarketCap()
     }
-    func returnStockModel(symbol: String) -> StockModel? {
-        // The 'first' method returns an optional, so the function must also return an optional.
-        return allStocks.first { $0.SYMBOL == symbol }
-    }
+    
+    /// Find the `StockModel` for a given symbol
+        func returnStockModel(symbol: String) -> StockModel? {
+            return allStocks.first { $0.SYMBOL == symbol }
+        }
 }

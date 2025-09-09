@@ -4,7 +4,7 @@ class StockDataService {
     static let shared = StockDataService()
     private init() {}
 
-    private let urlString = "http://192.168.1.30:8000/allstocks" //  FastAPI URL
+    private let urlString = "http://localhost:8000/allstocks" //  FastAPI URL
 
     func fetchStocks() async -> [StockModel] {
         guard let url = URL(string: urlString) else {

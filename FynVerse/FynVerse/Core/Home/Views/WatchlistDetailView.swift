@@ -3,6 +3,7 @@ import SwiftUI
 struct WatchlistDetailView: View {
     @StateObject private var vm: WatchlistDetailViewModel
     @ObservedObject var authvm: AuthViewModel
+    @EnvironmentObject var HomeVm: HomeViewModel
     
     init(watchlist: UserWatchlist, homeVM: HomeViewModel, authvm: AuthViewModel) {
         _vm = StateObject(wrappedValue: WatchlistDetailViewModel(watchlist: watchlist, homeVM: homeVM))
@@ -13,9 +14,9 @@ struct WatchlistDetailView: View {
         ZStack {
             Color.theme.background.ignoresSafeArea()
             VStack {
-                if let nifty = vm.filteredWatchlistStocks.first(where: { $0.SYMBOL == "NIFTY 50" }) {
-                    StatisticsView(nifty50: nifty, authvm: authvm)
-                }
+                CompactStatisticsView(nifty50: HomeVm.returnStockModel(symbol: "NIFTY50"), authvm: authvm)
+                        .frame(maxHeight: 100)
+                        .clipped()
                 
                 SearchBarView(searchText: $vm.searchText)
                     .padding(.horizontal)
@@ -32,7 +33,7 @@ struct WatchlistDetailView: View {
                             NavigationLink(
                                 destination: DetailView(stock: stock, DBStock: nil, authViewModel: authvm)
                             ) {
-                                StockRowView(stock: stock, portfolioStock: nil)
+                                StockRowView(stock: stock, authvm: authvm)
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) {

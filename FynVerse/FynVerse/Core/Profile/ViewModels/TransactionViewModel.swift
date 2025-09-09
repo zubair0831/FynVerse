@@ -41,8 +41,6 @@ class TransactionViewModel: ObservableObject {
     }
 
     
-    
-    
     /// Calculates PnL for all sell transactions using the FIFO method.
     /// It correctly handles short sells by assigning a zero cost basis to unmatched shares.
     var sellDetails: [SellDetail] {

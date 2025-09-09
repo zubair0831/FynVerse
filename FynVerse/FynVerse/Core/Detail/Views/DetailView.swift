@@ -20,45 +20,60 @@ struct DetailView: View {
         ZStack {
             Color.theme.background.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 20) {
-                    
-                    // Chart
-                    if let stock = vm.stock {
-                        VStack(spacing: 0) {
-                            StockChartView(symbol: stock.SYMBOL)
-                                .frame(height: 280)
-                                .padding(.horizontal)
-                                .padding(.top, 12)
-                            Divider()
-                                .padding(.horizontal)
-                                .padding(.bottom, 6)
+                ScrollView {
+                    VStack(spacing: 20) {
+                        
+                        // Chart
+                        if let stock = vm.stock {
+                            VStack(spacing: 0) {
+                                StockChartView(symbol: stock.SYMBOL)
+                                    .frame(height: 280)
+                                    .padding(.horizontal)
+                                    .padding(.top, 12)
+                                Divider()
+                                    .padding(.horizontal)
+                                    .padding(.bottom, 6)
+                            }
+                        }
+                        if vm.isLoading {
+                            VStack {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Color.theme.accent))
+                                    .scaleEffect(1.5)
+                                Text("Loading stock details...")
+                                    .font(.headline)
+                                    .padding(.top, 10)
+                                    .foregroundColor(Color.theme.accent)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            
+                            // Predictions
+                            if let stock = vm.stock {
+                                Next5DPredictionView(
+                                    stockSymbol: stock.SYMBOL,
+                                    prediction: predictionVM.next5DPrediction,
+                                    isLoading: predictionVM.isLoading,
+                                    animateSpinner: predictionVM.animateSpinner
+                                )
+                                .padding(.top)
+                            }
+                            
+                            // Tab Selector + Content
+                            tabSelector
+                            tabDetailView
                         }
                     }
-                    
-                    // Predictions
-                    if let stock = vm.stock {
-                        Next5DPredictionView(
-                            stockSymbol: stock.SYMBOL,
-                            prediction: predictionVM.next5DPrediction,
-                            longPred: predictionVM.longShortPrediction,
-                            isLoading: predictionVM.isLoading,
-                            animateSpinner: predictionVM.animateSpinner
-                        )
-                        .padding(.top)
-                    }
-
-                    // Tab Selector + Content
-                    tabSelector
-                    tabDetailView
-                }
-                .padding(.bottom, 100)
+                            .padding(.bottom, 100)
+                
             }
             
             // Floating Buttons
             floatingBuySellView
         }
+        
         .task {
+            await vm.fetchStockDetails()
             guard let stock = vm.stock else { return }
             await predictionVM.fetchPredictions(for: stock.SYMBOL)
         }
@@ -92,32 +107,37 @@ struct DetailView: View {
     }
     
     // MARK: - Tab Selector
-    var tabSelector: some View {
+    private var tabSelector: some View {
         HStack(spacing: 0) {
-            Button {
-                vm.selectedTab = 0
-            } label: {
-                Text("Details")
-                    .fontWeight(vm.selectedTab == 0 ? .bold : .regular)
-                    .foregroundStyle(vm.selectedTab == 0 ? .white : .primary)
-                    .frame(maxWidth: .infinity)
+            ForEach(0..<3) { index in
+                Button {
+                    withAnimation(.spring()) {
+                        vm.selectedTab = index
+                    }
+                } label: {
+                    Text(tabTitle(for: index))
+                        .fontWeight(vm.selectedTab == index ? .bold : .regular)
+                        .foregroundStyle(vm.selectedTab == index ? Color.theme.accent : Color.theme.secondary)
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
+                }
             }
-            .buttonStyle(.plain)
-
-            Button {
-                vm.selectedTab = 1
-            } label: {
-                Text("About")
-                    .fontWeight(vm.selectedTab == 1 ? .bold : .regular)
-                    .foregroundStyle(vm.selectedTab == 1 ? .white : .primary)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.plain)
         }
+        .padding(6)
+        .background(Color.theme.secondary.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
-        .padding(.vertical, 8)
     }
     
+    private func tabTitle(for index: Int) -> String {
+        switch index {
+        case 0: return "Details"
+        case 1: return "About"
+        case 2: return "News"
+        default: return ""
+        }
+    }
+
     // MARK: - Floating Buy/Sell Buttons
     private var floatingBuySellView: some View {
         VStack {
@@ -161,45 +181,84 @@ struct DetailView: View {
             if vm.selectedTab == 0 {
                 VStack(spacing: 20) {
                     if let stock = vm.stock {
-                        StockRowView(stock: stock, portfolioStock: vm.DBStock)
-                    }
-                    
-                    // Overview
-                    SectionHeader(title: "Overview")
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(vm.overviewInfo().prefix(vm.showMoreOverview ? .max : 4), id: \.0) { item in
-                            InfoCell(title: item.0, value: item.1)
+                        if let portfolioStock = vm.DBStock {
+                            // ✅ Show portfolio row if user holds this stock
+                            PortfolioRowView(
+                                vm: StockRowViewModel(
+                                    stock: stock,
+                                    portfolioStock: portfolioStock
+                                ), authvm: authViewModel
+                            )
+                        } else {
+                            // ✅ Fallback to plain stock row
+                            StockRowView(stock: stock, authvm: authViewModel)
                         }
                     }
-                    .padding(.horizontal)
                     
-                    Button(vm.showMoreOverview ? "Show less" : "Read more") {
-                        withAnimation { vm.showMoreOverview.toggle() }
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(.blue)
-                    
-                    // Additional Details
-                    SectionHeader(title: "Additional Details")
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(vm.additionalInfo().prefix(vm.showMoreDetails ? .max : 4), id: \.0) { item in
-                            InfoCell(title: item.0, value: item.1)
+                    // Company Overview
+                    if !vm.overviewTuples.isEmpty {
+                        sectionHeader(title: "Company Overview")
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            ForEach(vm.overviewTuples.prefix(vm.showMoreOverview ? vm.overviewTuples.count : 4), id: \.0) { item in
+                                InfoCell(title: item.0, value: item.1)
+                            }
                         }
+                        .padding(.horizontal)
+                        
+                        Button(vm.showMoreOverview ? "Show less" : "Read more") {
+                            withAnimation { vm.showMoreOverview.toggle() }
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
                     }
-                    .padding(.horizontal)
                     
-                    Button(vm.showMoreDetails ? "Show less" : "Read more") {
-                        withAnimation { vm.showMoreDetails.toggle() }
+                    // Additional Metrics
+                    if !vm.additionalTuples.isEmpty {
+                        sectionHeader(title: "Additional Metrics")
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            ForEach(vm.additionalTuples.prefix(vm.showMoreDetails ? vm.additionalTuples.count : 4), id: \.0) { item in
+                                InfoCell(title: item.0, value: item.1)
+                            }
+                        }
+                        .padding(.horizontal)
+                        
+                        Button(vm.showMoreDetails ? "Show less" : "Read more") {
+                            withAnimation { vm.showMoreDetails.toggle() }
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
                     }
-                    .font(.subheadline)
-                    .foregroundColor(.blue)
                 }
                 .padding(.top)
-            } else {
-                StockSummaryView(stockName: summaryVM.stockName)
+            } else if vm.selectedTab == 1 {
+                // About tab
+                StockSummaryView(Dvm: vm)
                     .padding(.top)
+                
+            } else if vm.selectedTab == 2 {
+                // News tab
+                if let stock = vm.stock {
+                    StockNewsView(symbol: stock.SYMBOL)
+                        .padding(.top)
+                } else {
+                    Text("No stock selected")
+                        .foregroundColor(.secondary)
+                }
             }
         }
+    }
+
+    
+    // MARK: - Helper Views
+    private func sectionHeader(title: String) -> some View {
+        VStack(alignment: .leading) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(Color.theme.accent)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Divider()
+        }
+        .padding(.horizontal)
     }
 }
 
@@ -210,3 +269,5 @@ extension Array {
         indices.contains(index) ? self[index] : nil
     }
 }
+
+

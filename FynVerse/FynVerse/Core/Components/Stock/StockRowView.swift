@@ -1,107 +1,88 @@
+// MARK: - Enhanced Stock Row View
+
 import SwiftUI
 
 struct StockRowView: View {
-    @StateObject var vm: StockRowViewModel
-    
-    init(stock: StockModel, portfolioStock: DBPortfolioStock? = nil) {
-        _vm = StateObject(wrappedValue: StockRowViewModel(stock: stock, portfolioStock: portfolioStock))
-    }
+    let stock: StockModel
+    @State private var isPressed = false
+    @ObservedObject var authvm: AuthViewModel
     
     var body: some View {
-        VStack(spacing: 0) {
+        NavigationLink {
+            DetailView(stock: stock, DBStock: nil, authViewModel: authvm)
+        } label: {
             HStack(spacing: 16) {
-                // MARK: - Stock Icon
-                StockImageView(stock: vm.stock)
-                    .frame(width: 40, height: 40)
-                    .clipShape(Circle())
-                    .padding(.vertical, 8)
+                // Stock Icon with shimmer effect
+                stockIcon
                 
-                // MARK: - Stock Info
+                // Stock Info
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(vm.stock.SYMBOL)
+                    Text(stock.SYMBOL)
                         .font(.headline)
+                        .fontWeight(.bold)
                         .foregroundStyle(Color.theme.accent)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.8)
                     
-                    Text(vm.stock.NAME_OF_COMPANY)
-                        .font(.footnote)
+                    Text(stock.NAME_OF_COMPANY)
+                        .font(.caption)
                         .foregroundStyle(Color.theme.secondary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
                 }
                 
                 Spacer()
                 
-                // MARK: - Market Price + % Change
+                // Price and Change
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(vm.stock.Last_Price.asCurrencyWith2Decimals())
+                    Text(stock.Last_Price.asCurrencyWith2Decimals())
                         .font(.headline)
-                        .bold()
+                        .fontWeight(.bold)
                         .foregroundStyle(Color.theme.accent)
                     
-                    Text(vm.stock.Percent_Change.asPercentString())
-                        .font(.subheadline)
-                        .bold()
-                        .foregroundStyle(vm.stock.Percent_Change >= 0 ? Color.theme.green : Color.theme.red)
+                    HStack(spacing: 4) {
+                        Image(systemName: stock.Percent_Change >= 0 ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
+                            .font(.caption2)
+                        
+                        Text(stock.Percent_Change.asPercentString())
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundStyle(stock.Percent_Change >= 0 ? Color.theme.green : Color.theme.red)
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            
-            // MARK: - Portfolio Section
-            if let portfolio = vm.portfolioStock {
-                Divider()
-                    .padding(.horizontal)
-                
-                Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 8) {
-                    GridRow {
-                        Text("Holdings:")
-                            .font(.caption)
-                            .foregroundStyle(Color.theme.secondary)
-                        
-                        Text("\(portfolio.quantity)")
-                            .font(.subheadline).bold()
-                            .foregroundStyle(Color.theme.accent)
-                        
-                        Text("Gain/Loss:")
-                            .font(.caption)
-                            .foregroundStyle(Color.theme.secondary)
-                        
-                        Text("\(vm.gainLoss.asCurrencyWith2Decimals()) (\(vm.gainLossPercentage.asPercentString()))")
-                            .font(.subheadline).bold()
-                            .foregroundStyle(vm.gainLoss >= 0 ? Color.theme.green : Color.theme.red)
-                    }
-                    
-                    GridRow {
-                        Text("Avg. Price:")
-                            .font(.caption)
-                            .foregroundStyle(Color.theme.secondary)
-                        
-                        Text(portfolio.avgBuyPrice.asCurrencyWith2Decimals())
-                            .font(.subheadline).bold()
-                            .foregroundStyle(Color.theme.accent)
-                        
-                        Text("Total:")
-                            .font(.caption)
-                            .foregroundStyle(Color.theme.secondary)
-                        
-                        Text(vm.currentHoldingValue.asCurrencyWith2Decimals())
-                            .font(.subheadline).bold()
-                            .foregroundStyle(Color.theme.accent)
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom)
-            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.theme.cardBackground)
+                    .shadow(
+                        color: isPressed ? Color.theme.accent.opacity(0.2) : .black.opacity(0.06),
+                        radius: isPressed ? 8 : 4,
+                        x: 0,
+                        y: isPressed ? 4 : 2
+                    )
+            )
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
+            .onLongPressGesture(minimumDuration: 0.1, pressing: { pressing in
+                isPressed = pressing
+            }, perform: {})
         }
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color.theme.cardBackground)
-                .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
-        )
-        .cornerRadius(12)
-        .shadow(color: Color.theme.accent.opacity(0.1), radius: 5, x: 0, y: 5)
-        .padding(.horizontal)
+    }
+    
+    // MARK: - Stock Icon
+    private var stockIcon: some View {
+        ZStack {
+            Circle()
+                .fill(Color.theme.accent.opacity(0.1))
+                .frame(width: 50, height: 50)
+            
+            StockImageView(stock: stock)
+                .frame(width: 40, height: 40)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(Color.theme.accent.opacity(0.2), lineWidth: 1)
+                )
+        }
     }
 }

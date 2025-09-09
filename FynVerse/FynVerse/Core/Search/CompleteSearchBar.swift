@@ -44,7 +44,7 @@ struct CompleteSearchBar: View {
 
                             ForEach(vm.recentStocks) { stock in
                                 NavigationLink(destination: DetailView(stock: stock, DBStock: nil, authViewModel: authvm)) {
-                                    StockRowView(stock: stock, portfolioStock: nil)
+                                    StockRowView(stock: stock, authvm: authvm)
                                 }
                             }
                         } else {
@@ -52,7 +52,7 @@ struct CompleteSearchBar: View {
                                 NavigationLink(
                                     destination: DetailView(stock: stock, DBStock: nil, authViewModel: authvm)
                                 ) {
-                                    StockRowView(stock: stock, portfolioStock: nil)
+                                    StockRowView(stock: stock, authvm: authvm)
                                 }
                                 .simultaneousGesture(TapGesture().onEnded {
                                     vm.saveRecentSearch(stock: stock)

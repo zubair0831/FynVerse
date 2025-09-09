@@ -1,16 +1,18 @@
 import SwiftUI
 
 struct StockSummaryView: View {
+    @ObservedObject var Dvm: DetailViewModel
     @StateObject private var vm: StockSummaryViewModel
     @State private var isSummaryExpanded: Bool = false
 
-    init(stockName: String) {
-        _vm = StateObject(wrappedValue: StockSummaryViewModel(stockName: stockName))
+    init(Dvm: DetailViewModel) {
+        self.Dvm = Dvm
+        _vm = StateObject(wrappedValue: StockSummaryViewModel(stockName: Dvm.stock?.SYMBOL ?? ""))
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("GEMINI Flash Summary")
+            Text(" Summary")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundStyle(Color.theme.accent)
@@ -23,10 +25,11 @@ struct StockSummaryView: View {
                     Text("Overview")
                         .font(.headline)
 
-                    Text(vm.summary.first ?? "No summary available.")
+                    Text(Dvm.stockComprehensive?.basic?.businessSummary ?? "No summary available.")
                         .foregroundStyle(Color.theme.secondary)
                         .font(.body)
                         .lineLimit(isSummaryExpanded ? nil : 4)
+
 
                     Button(action: {
                         withAnimation(.easeInOut) {
@@ -41,10 +44,10 @@ struct StockSummaryView: View {
 
                     if vm.summary.count >= 3 {
                         Divider()
-                        Text("Pros: \(vm.summary[1])")
+                        Text("Pros(AI-Gemini): \(vm.summary[1])")
                             .foregroundStyle(Color.theme.green)
                             .font(.subheadline)
-                        Text("Cons: \(vm.summary[2])")
+                        Text("Cons(AI-Gemini): \(vm.summary[2])")
                             .foregroundStyle(Color.theme.red)
                             .font(.subheadline)
                     }
