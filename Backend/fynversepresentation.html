@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FynVerse Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 60px 80px;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-header {
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 20px;
+        }
+
+        .content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.6;
+            color: #333;
+            font-size: 1.05em;
+        }
+
+        li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .metric {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .slide-counter {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .authors {
+            color: #666;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .checkmark {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .stat-big {
+            font-size: 2.5em;
+            color: #667eea;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .formula {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1em;
+            border: 2px solid #e9ecef;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #667eea;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="slide-header">
+                <h1>FynVerse</h1>
+                <p class="subtitle">An Intelligent Stock Trading Simulator with RAG-Enhanced Conversational AI for Portfolio Learning in Indian Equity Markets</p>
+            </div>
+            <div class="content">
+                <div class="authors">
+                    <p><strong>Zubair Ahmed Mohammad</strong></p>
+                    <p><strong>Dr. B. V. Satish Babu</strong></p>
+                    <p><strong>Kolli Jagan Mohan Rao</strong></p>
+                </div>
+                <div class="highlight-box" style="margin-top: 40px;">
+                    <h3>VIT-AP University</h3>
+                    <p>School of Computer Science and Engineering (SCOPE)</p>
+                    <p>Amaravathi, Andhra Pradesh, India</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()" id="prevBtn" disabled>← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">27</span></span>
+                <button class="nav-btn" onclick="nextSlide()" id="nextBtn">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>The Problem</h1>
+                <p class="subtitle">Challenges in Financial Education</p>
+            </div>
+            <div class="content">
+                <ul>
+                    <li>Retail participation in NSE grew from <strong>2.7% (2019)</strong> to <strong>7.2% (2024)</strong></li>
+                    <li>Young investors lack safe learning environments</li>
+                    <li>Real trading too risky for novices</li>
+                    <li>Existing simulators lack intelligent feedback</li>
+                    <li>No personalized guidance systems</li>
+                </ul>
+                <div class="highlight-box" style="margin-top: 40px;">
+                    <h3>Critical Gap</h3>
+                    <p style="font-size: 1.1em;">No integrated platform combining simulation, analytics, and conversational AI for Indian markets</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()" id="prevBtn">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">2</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()" id="nextBtn">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Solution -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>FynVerse Solution</h1>
+                <p class="subtitle">Comprehensive Educational Platform</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>1. Realistic Trading Simulator</h3>
+                        <ul>
+                            <li>Virtual portfolios</li>
+                            <li>₹10,00,000 starting capital</li>
+                            <li>2,151 NSE stocks</li>
+                            <li>Real-time data</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>2. ML-Based Analytics</h3>
+                        <ul>
+                            <li>5-factor scoring (0-100)</li>
+                            <li>Random Forest (R²=0.762)</li>
+                            <li>Transparent A-F grading</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>3. Sector-Adjusted Valuation</h3>
+                        <ul>
+                            <li>Context-aware P/E</li>
+                            <li>Indian growth sectors</li>
+                            <li>PEG ratio analysis</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>4. RAG-Enhanced AI Assistant</h3>
+                        <ul>
+                            <li>Portfolio-specific Q&A</li>
+                            <li>94% relevance</li>
+                            <li>Personalized guidance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">3</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Architecture -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>System Architecture</h1>
+                <p class="subtitle">Six-Layer Modular Design</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div>
+                        <h3>Frontend & Backend</h3>
+                        <div class="card">
+                            <strong>iOS Frontend</strong>
+                            <p>Swift/SwiftUI with MVVM pattern</p>
+                        </div>
+                        <div class="card">
+                            <strong>FastAPI Backend</strong>
+                            <p>8 REST endpoints, JWT auth</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Data & Storage</h3>
+                        <div class="card">
+                            <strong>Firebase Firestore</strong>
+                            <p>5,036 market caps, user data</p>
+                        </div>
+                        <div class="card">
+                            <strong>Yahoo Finance API</strong>
+                            <p>2,151 NSE stocks, real-time</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top: 20px;">
+                    <div class="card">
+                        <strong>ML Analytics Layer</strong>
+                        <p>Random Forest + Isolation Forest</p>
+                    </div>
+                    <div class="card">
+                        <strong>RAG Assistant</strong>
+                        <p>Google Gemini 2.0 Flash API</p>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <span class="metric">99.8% availability</span>
+                    <span class="metric">&lt;200ms response</span>
+                    <span class="metric">92% test coverage</span>
+                    <span class="metric">60 FPS performance</span>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">4</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: Virtual Trading -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Feature 1: Virtual Trading</h1>
+                <p class="subtitle">Comprehensive Trading Capabilities</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div>
+                        <h3>Core Functions</h3>
+                        <ul>
+                            <li>Search <strong>2,151 NSE stocks</strong></li>
+                            <li>Real-time price updates (&lt;3s freshness)</li>
+                            <li>Virtual buy/sell transactions</li>
+                            <li>Automatic position tracking</li>
+                            <li>Transaction history with P&L</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Stock Details Include</h3>
+                        <ul>
+                            <li>Price charts (1D to 3Y)</li>
+                            <li>Fundamentals and ratios</li>
+                            <li>Technical indicators</li>
+                            <li>Sector information</li>
+                            <li>Realized/unrealized gains</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <p style="font-size: 1.2em; text-align: center;"><strong>₹10,00,000</strong> Starting Virtual Capital</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">5</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 6: Portfolio Scoring -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Feature 2: Portfolio Scoring</h1>
+                <p class="subtitle">Five-Factor Algorithm (0-100 Scale)</p>
+            </div>
+            <div class="content">
+                <div class="formula">
+                    Score = 0.25D + 0.20PE + 0.25R + 0.15A + 0.15M
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <div class="card">
+                            <strong>D (25%) - Diversification</strong>
+                            <p>Sector HHI, sector count, max sector weight</p>
+                        </div>
+                        <div class="card">
+                            <strong>PE (20%) - P/E Rating</strong>
+                            <p>Sector-adjusted valuation with PEG ratios</p>
+                        </div>
+                        <div class="card">
+                            <strong>R (25%) - Risk Management</strong>
+                            <p>Beta analysis (target 0.8-1.2), concentration</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <strong>A (15%) - Allocation Quality</strong>
+                            <p>Gini coefficient, position sizing (optimal 8-15 holdings)</p>
+                        </div>
+                        <div class="card">
+                            <strong>M (15%) - Market Cap Mix</strong>
+                            <p>Large (60-70%), Mid (15-30%), Small (5-15%)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p style="text-align: center; font-size: 1.1em;"><strong>Output:</strong> Letter grades (A-F) with actionable recommendations</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">6</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 7: ML Analytics -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Feature 3: ML Analytics Pipeline</h1>
+                <p class="subtitle">Dual Machine Learning Models</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div>
+                        <h3>Random Forest Risk Scorer</h3>
+                        <ul>
+                            <li><strong>15 engineered features</strong></li>
+                            <li>200 estimators, max depth 15</li>
+                            <li>Training: 100 synthetic portfolios</li>
+                            <li><strong>R²=0.762, MAE=1.28%</strong></li>
+                            <li>5-fold CV: R²=0.741±0.018</li>
+                        </ul>
+                        <h3 style="margin-top: 20px;">Top Feature Importance</h3>
+                        <div class="card">
+                            <p>Sector HHI: <strong>28.03%</strong></p>
+                            <p>Gini coefficient: <strong>15.68%</strong></p>
+                            <p>P/E std: <strong>12.11%</strong></p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Isolation Forest Anomaly Detection</h3>
+                        <ul>
+                            <li>100 estimators</li>
+                            <li>10% contamination threshold</li>
+                            <li>Flags extreme concentration &gt;70%</li>
+                            <li><strong>0% false positives</strong></li>
+                        </ul>
+                        <h3 style="margin-top: 20px;">Baseline Comparisons</h3>
+                        <div class="card">
+                            <p>vs. Equal-weighted linear:</p>
+                            <p><strong>+17.2% improvement</strong></p>
+                        </div>
+                        <div class="card">
+                            <p>vs. Naive diversification:</p>
+                            <p><strong>+21.3% improvement</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">7</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: RAG Assistant -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Feature 4: RAG Assistant</h1>
+                <p class="subtitle">Portfolio-Aware Conversational AI</p>
+            </div>
+            <div class="content">
+                <div class="grid-3">
+                    <div class="card">
+                        <h3>Dynamic Context</h3>
+                        <p><strong>25-45ms</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>User profile</li>
+                            <li>Portfolio summary</li>
+                            <li>Individual holdings</li>
+                            <li>365-day history</li>
+                            <li>Sector metrics</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Intent Detection</h3>
+                        <p><strong>91% accuracy</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>9 query categories</li>
+                            <li>Keyword-based routing</li>
+                            <li>Context-aware classification</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Gemini Integration</h3>
+                        <p><strong>120-180ms</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>2.0 Flash API</li>
+                            <li>4-message history</li>
+                            <li>System role + knowledge</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h3>Key Innovation</h3>
+                    <p style="font-size: 1.1em;">Conversational AI answers portfolio-specific questions by retrieving relevant context from actual user holdings and fundamentals</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">8</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 9: RAG Impact -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>RAG Assistant Impact</h1>
+                <p class="subtitle">Transformative Educational Value</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div>
+                        <h3>Performance Metrics</h3>
+                        <div class="stat-big">94%</div>
+                        <p><strong>Response relevance</strong> (human evaluation)</p>
+                        <div class="stat-big" style="font-size: 2em;">87%</div>
+                        <p><strong>User satisfaction</strong></p>
+                        <ul style="margin-top: 20px;">
+                            <li>89% appropriate portfolio context usage</li>
+                            <li>Fleiss' kappa: κ=0.82 (strong agreement)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Key Advantages</h3>
+                        <ul>
+                            <li>Contextual awareness with <strong>actual holdings</strong></li>
+                            <li>Specific numerical recommendations</li>
+                            <li>Portfolio-specific examples</li>
+                            <li>Actionable insights with grade projections</li>
+                        </ul>
+                        <div class="highlight-box" style="margin-top: 20px;">
+                            <h3>User Feedback</h3>
+                            <p><strong>85%</strong> reported "clarified investment concepts"</p>
+                            <p><strong>94%</strong> actively used assistant</p>
+                            <p><strong>8.3 queries/week</strong> average</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">9</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 10: Responsible AI -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Responsible AI Principles</h1>
+                <p class="subtitle">Ethical Design Throughout Platform</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Transparency</h3>
+                        <ul>
+                            <li>ML feature importance explanations</li>
+                            <li>Disclosed scoring thresholds</li>
+                            <li>RAG data source indications</li>
+                            <li>Synthetic training data limitations stated</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>User Control</h3>
+                        <ul>
+                            <li>Conversation history management</li>
+                            <li>Authenticated data access</li>
+                            <li>Data export functionality</li>
+                            <li>Clear opt-in mechanisms</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Educational Focus</h3>
+                        <ul>
+                            <li>Investment disclaimers</li>
+                            <li>Risk warnings for volatility</li>
+                            <li>No guaranteed returns claims</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Privacy</h3>
+                        <ul>
+                            <li>Encrypted storage</li>
+                            <li>Firebase security rules</li>
+                            <li>No third-party sharing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">10</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 11: Study Design -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>User Study Design</h1>
+                <p class="subtitle">Controlled Experiment - Validation Methodology</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Study Parameters</h3>
+                        <ul>
+                            <li><strong>Participants:</strong> 25 VIT-AP undergraduates (ages 19-22)</li>
+                            <li><strong>Duration:</strong> 4 weeks (Feb-March 2024)</li>
+                            <li><strong>Starting Capital:</strong> ₹10,00,000 virtual</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Groups</h3>
+                        <ul>
+                            <li><strong>Experimental (N=10):</strong> Full FynVerse access</li>
+                            <li><strong>Control (N=15):</strong> Basic simulator only (no ML/RAG)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h3>Primary Outcome</h3>
+                    <p style="font-size: 1.2em; text-align: center;"><strong>Portfolio Quality Score (0-100)</strong></p>
+                </div>
+                <div class="grid-3" style="margin-top: 20px;">
+                    <div class="card">
+                        <strong>Secondary Outcomes</strong>
+                        <p>Sector HHI (diversification)</p>
+                    </div>
+                    <div class="card">
+                        <strong>Secondary Outcomes</strong>
+                        <p>Gini coefficient (allocation)</p>
+                    </div>
+                    <div class="card">
+                        <strong>Secondary Outcomes</strong>
+                        <p>Investment confidence</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">11</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 12: Results Portfolio Quality -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Results: Portfolio Quality</h1>
+                <p class="subtitle">Significant Educational Impact</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card" style="border: 3px solid #28a745;">
+                        <h3 style="color: #28a745;">Experimental Group ✓</h3>
+                        <p>Week 0: <strong>62.4±8.3</strong> → Week 4: <strong>74.8±6.1</strong></p>
+                        <div class="stat-big" style="color: #28a745;">+19.8%</div>
+                        <p style="font-size: 1.1em;"><strong>Improvement: +12.4 points</strong></p>
+                        <ul>
+                            <li>Paired t=6.42, <strong>p&lt;0.001</strong></li>
+                            <li><strong>Cohen's d=1.28</strong> (large effect)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Control Group</h3>
+                        <p>Week 0: <strong>61.8±7.9</strong> → Week 4: <strong>65.2±8.4</strong></p>
+                        <div class="stat-big" style="color: #666;">+5.5%</div>
+                        <p style="font-size: 1.1em;">Improvement: +3.4 points</p>
+                        <ul>
+                            <li>Paired t=1.94, p=0.063 (not significant)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px; background: linear-gradient(135deg, #28a74515 0%, #28a74525 100%); border-left: 4px solid #28a745;">
+                    <h3 style="color: #28a745;">Between-Group Comparison</h3>
+                    <p style="font-size: 1.3em; text-align: center;"><strong>Final score difference: 9.6 points (14.4% advantage)</strong></p>
+                    <p style="text-align: center;">Independent t=2.98, <strong>p=0.002</strong></p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">12</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 13: Secondary Outcomes -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Results: Secondary Outcomes</h1>
+                <p class="subtitle">Comprehensive Learning Improvements</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div>
+                        <h3>Diversification (Sector HHI)</h3>
+                        <div class="card" style="border: 2px solid #28a745;">
+                            <strong>Experimental: -44.7%</strong>
+                            <p>p&lt;0.001 <span class="checkmark">✓</span></p>
+                        </div>
+                        <div class="card">
+                            <strong>Control: -11.1%</strong>
+                            <p>p=0.089</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Allocation Balance (Gini)</h3>
+                        <div class="card" style="border: 2px solid #28a745;">
+                            <strong>Experimental: -31.7%</strong>
+                            <p>p=0.002 <span class="checkmark">✓</span></p>
+                        </div>
+                        <div class="card">
+                            <strong>Control: -10.3%</strong>
+                            <p>p=0.124</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h3>Investment Confidence</h3>
+                    <div class="grid-2">
+                        <div>
+                            <div class="stat-big" style="color: #28a745;">+70.8%</div>
+                            <p>Experimental (p&lt;0.001)</p>
+                        </div>
+                        <div>
+                            <div class="stat-big" style="color: #666; font-size: 2em;">+21.7%</div>
+                            <p>Control (p=0.042)</p>
+                        </div>
+                    </div>
+                </div>
+                <h3>Feature Usage (Experimental Group)</h3>
+                <span class="metric">94% used RAG assistant</span>
+                <span class="metric">88% consulted ML analytics</span>
+                <span class="metric">92% rated A-F "very helpful"</span>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">13</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 14: System Performance -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>System Performance</h1>
+                <p class="subtitle">Production-Ready Metrics</p>
+            </div>
+            <div class="content">
+                <div class="grid-3">
+                    <div class="card">
+                        <h3>Data Layer</h3>
+                        <ul>
+                            <li><strong>2,151 NSE stocks</strong></li>
+                            <li>99.8% availability</li>
+                            <li>5,036 market caps</li>
+                            <li>&lt;3s data freshness</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>API Performance</h3>
+                        <ul>
+                            <li>Median: <strong>&lt;200ms</strong></li>
+                            <li>95th percentile: 380ms</li>
+                            <li>99th percentile: 520ms</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>ML Analytics</h3>
+                        <ul>
+                            <li>Model load: &lt;500ms</li>
+                            <li>Single inference: 15-25ms</li>
+                            <li>Batch inference: 45-80ms</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grid-3" style="margin-top: 20px;">
+                    <div class="card">
+                        <h3>RAG Assistant</h3>
+                        <ul>
+                            <li>Context: 25-45ms</li>
+                            <li>Total query: <strong>&lt;250ms</strong></li>
+                            <li>94% relevance</li>
+                            <li>91% intent accuracy</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>iOS Application</h3>
+                        <ul>
+                            <li>Memory: &lt;120MB</li>
+                            <li>Battery: &lt;5%/hour</li>
+                            <li><strong>0% crash rate</strong></li>
+                            <li>300 sessions tested</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Quality Metrics</h3>
+                        <ul>
+                            <li><strong>92% test coverage</strong></li>
+                            <li>60 FPS performance</li>
+                            <li>MVVM architecture</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">14</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 15: Load Testing -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Load Testing Results</h1>
+                <p class="subtitle">Scalability Validation</p>
+            </div>
+            <div class="content">
+                <h3>Concurrent User Testing</h3>
+                <div class="grid-3">
+                    <div class="card" style="border: 2px solid #28a745;">
+                        <h3>50 Users</h3>
+                        <p>480ms avg</p>
+                        <p><strong>0% errors</strong> <span class="checkmark">✓</span></p>
+                    </div>
+                    <div class="card" style="border: 2px solid #28a745;">
+                        <h3>100 Users</h3>
+                        <p>820ms avg</p>
+                        <p><strong>0.2% errors</strong> <span class="checkmark">✓</span></p>
+                    </div>
+                    <div class="card" style="border: 2px solid #ffc107;">
+                        <h3>200 Users</h3>
+                        <p>1,450ms avg</p>
+                        <p>3.1% errors (saturation)</p>
+                    </div>
+                </div>
+                <h3 style="margin-top: 30px;">ML Model Robustness</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <ul>
+                            <li>Test set: <strong>R²=0.762</strong></li>
+                            <li>5-fold CV: R²=0.741±0.018</li>
+                            <li>Bootstrap 95% CI: [0.721, 0.798]</li>
+                            <li>Temporal validation: R²=0.728</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Baseline Comparisons</h3>
+                        <p>vs. Equal-weighted linear:</p>
+                        <p><strong>+17.2% improvement</strong></p>
+                        <p>vs. Naive diversification:</p>
+                        <p><strong>+21.3% improvement</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">15</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 16: Platform Comparison -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Platform Comparison</h1>
+                <p class="subtitle">FynVerse vs. Existing Indian Platforms</p>
+            </div>
+            <div class="content">
+                <div class="table-container">
+                    <table>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Groww</th>
+                            <th>ET Money</th>
+                            <th>Moneycrtl</th>
+                            <th>Sensibull</th>
+                            <th style="background: #28a745;">FynVerse</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Trading Sim</strong></td>
+                            <td>Basic</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>Yes</td>
+                            <td style="background: #d4edda;"><strong>Yes</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ML Analytics</strong></td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>Basic</td>
+                            <td>No</td>
+                            <td style="background: #d4edda;"><strong>Yes</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>RAG Assistant</strong></td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td style="background: #d4edda;"><strong>Yes (94%)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Portfolio Scoring</strong></td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>Partial</td>
+                            <td style="background: #d4edda;"><strong>5-factor A-F</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sector P/E Adj</strong></td>
+                            <td>Manual</td>
+                            <td>Static</td>
+                            <td>Static</td>
+                            <td>Theme</td>
+                            <td style="background: #d4edda;"><strong>Context-Adj</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Educational</strong></td>
+                            <td>Partial</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>Partial</td>
+                            <td style="background: #d4edda;"><strong>Validated</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Explainability</strong></td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td style="background: #d4edda;"><strong>Yes</strong></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p style="text-align: center; font-size: 1.2em;"><strong>Unique Value:</strong> Only platform integrating all features with validated impact</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">16</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 17: Key Innovations -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Key Innovations</h1>
+                <p class="subtitle">Novel Contributions to Financial Education</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>1. End-to-End iOS Simulator</h3>
+                        <ul>
+                            <li>MVVM architecture with 92% test coverage</li>
+                            <li>2,151 NSE stocks, 99.8% availability</li>
+                            <li>Comprehensive Indian equity market access</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>2. Five-Factor Scoring System</h3>
+                        <ul>
+                            <li>Mathematical metrics + ML risk assessment</li>
+                            <li>Transparent explainability for novices</li>
+                            <li>Objective portfolio composition analysis</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>3. RAG-Based Assistant</h3>
+                        <ul>
+                            <li>Google Gemini 2.0 Flash integration</li>
+                            <li>Dynamic context from actual holdings</li>
+                            <li>Personalized Q&A (94% relevance)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>4. Sector-Adjusted P/E Framework</h3>
+                        <ul>
+                            <li>Indian market context interpretation</li>
+                            <li>Growth-oriented sector analysis</li>
+                            <li>Avoids universal benchmark limitations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">17</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 18: Learning Cycle -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Closed-Loop Learning Cycle</h1>
+                <p class="subtitle">Synergistic Educational Benefits</p>
+            </div>
+            <div class="content">
+                <div class="highlight-box">
+                    <h3 style="text-align: center;">The Learning Process</h3>
+                    <div style="text-align: center; margin: 30px 0; font-size: 1.2em; line-height: 2em;">
+                        <p><strong>1. Trade Stocks</strong> → Execute virtual transactions</p>
+                        <p style="color: #667eea;">↓</p>
+                        <p><strong>2. Receive Feedback</strong> → ML analytics with A-F grading</p>
+                        <p style="color: #667eea;">↓</p>
+                        <p><strong>3. Ask Questions</strong> → RAG assistant explains concepts</p>
+                        <p style="color: #667eea;">↓</p>
+                        <p><strong>4. Apply Insights</strong> → Improve portfolio based on guidance</p>
+                        <p style="color: #667eea;">↓</p>
+                        <p><strong>5. Repeat</strong> → Continuous skill development</p>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top: 30px;">
+                    <div class="card">
+                        <h3>Why It Works</h3>
+                        <ul>
+                            <li>Immediate quantitative feedback</li>
+                            <li>Portfolio-specific recommendations</li>
+                            <li>Conversational interface reduces cognitive load</li>
+                            <li>Real holdings make concepts concrete</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Result</h3>
+                        <div class="stat-big">85%</div>
+                        <p>reported "clarified investment concepts"</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">18</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 19: Technical Highlights -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Technical Highlights</h1>
+                <p class="subtitle">Engineering Excellence</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Frontend (iOS)</h3>
+                        <ul>
+                            <li>Swift/SwiftUI with MVVM pattern</li>
+                            <li><strong>60 FPS performance</strong></li>
+                            <li>&lt;120MB memory footprint</li>
+                            <li><strong>0% crash rate</strong></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Backend (FastAPI)</h3>
+                        <ul>
+                            <li>Python 3.10+ with 8 REST endpoints</li>
+                            <li>JWT authentication</li>
+                            <li><strong>Sub-200ms median response</strong></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Machine Learning</h3>
+                        <ul>
+                            <li>scikit-learn v1.3.0</li>
+                            <li>15 engineered features</li>
+                            <li>Grid search over 27 combinations</li>
+                            <li>StandardScaler normalization</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Data Pipeline</h3>
+                        <ul>
+                            <li>yfinance v0.2.28</li>
+                            <li>Real-time NSE integration</li>
+                            <li>Firebase Firestore storage</li>
+                            <li>Daily market cap updates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">19</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 20: Sector-Adjusted Valuation -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Sector-Adjusted Valuation</h1>
+                <p class="subtitle">Context-Aware P/E Interpretation</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card" style="border: 2px solid #dc3545;">
+                        <h3>Traditional Problem</h3>
+                        <ul>
+                            <li>Universal P/E benchmarks fail for growth sectors</li>
+                            <li>High P/E incorrectly signals overvaluation</li>
+                            <li>Ignores sector-specific growth dynamics</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="border: 2px solid #28a745;">
+                        <h3>FynVerse Solution</h3>
+                        <ul>
+                            <li>Sector-specific P/E interpretation</li>
+                            <li>PEG ratio analysis (P/E relative to growth)</li>
+                            <li>CAGR-based growth assessment</li>
+                            <li>Fundamental strength evaluation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h3>Indian Growth Sectors</h3>
+                    <div class="grid-2">
+                        <div>
+                            <span class="metric">Technology</span>
+                            <span class="metric">Renewable Energy</span>
+                        </div>
+                        <div>
+                            <span class="metric">Food Delivery</span>
+                            <span class="metric">E-commerce</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 20px;">
+                    <p><strong>Framework:</strong> Based on Mohammad's work [SSRN 5411683]</p>
+                    <p>Establishes that high P/E can reflect legitimate growth expectations</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">20</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 21: Limitations -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Limitations & Challenges</h1>
+                <p class="subtitle">Current Constraints</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Data & Training</h3>
+                        <ul>
+                            <li>ML trained on 100 synthetic portfolios</li>
+                            <li>Limited real-world portfolio diversity</li>
+                            <li>Real portfolio collection ongoing</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Context Scope</h3>
+                        <ul>
+                            <li>RAG limited to portfolio data only</li>
+                            <li>No news sentiment analysis</li>
+                            <li>Missing macroeconomic indicators</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Platform</h3>
+                        <ul>
+                            <li>iOS-only deployment (Android planned)</li>
+                            <li>4-message conversation history</li>
+                            <li>No web platform yet</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Study Design</h3>
+                        <ul>
+                            <li>Small sample (N=25)</li>
+                            <li>Short duration (4 weeks)</li>
+                            <li>Single institution</li>
+                            <li>Limited generalizability</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">21</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 22: Future Roadmap -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Future Roadmap</h1>
+                <p class="subtitle">Three-Phase Development Plan</p>
+            </div>
+            <div class="content">
+                <div class="card">
+                    <h3>Phase 1 (Q2 2025) - Scale & Validate</h3>
+                    <ul>
+                        <li>Expand ML training to <strong>500+ real portfolios</strong></li>
+                        <li>Target <strong>R²&gt;0.80</strong> prediction accuracy</li>
+                        <li>Horizontal backend scaling</li>
+                        <li>Deploy to institutional partners</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Phase 2 (Q3 2025) - Feature Expansion</h3>
+                    <ul>
+                        <li>NLP sentiment analysis integration</li>
+                        <li><strong>Android application development</strong></li>
+                        <li>Vector embeddings for RAG</li>
+                        <li>Enhanced context retrieval</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Phase 3 (Q4 2025-Q1 2026) - Ecosystem</h3>
+                    <ul>
+                        <li>Macroeconomic context integration</li>
+                        <li><strong>Web platform launch</strong></li>
+                        <li>Multi-asset support (mutual funds, bonds)</li>
+                        <li>Open-source core components</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">22</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 23: Long-Term Vision -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Long-Term Vision</h1>
+                <p class="subtitle">Scaling Financial Education</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Research Goals</h3>
+                        <ul>
+                            <li>Larger longitudinal studies (<strong>N=200+</strong>)</li>
+                            <li>Multi-year tracking of learning outcomes</li>
+                            <li>Cross-institutional validation</li>
+                            <li>International market expansion</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Partnership Strategy</h3>
+                        <ul>
+                            <li>Educational institutions (universities, business schools)</li>
+                            <li>Financial literacy organizations</li>
+                            <li>Regulatory collaboration (SEBI, NSE)</li>
+                            <li>Industry partnerships</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h3>Open Source Commitment</h3>
+                    <div class="grid-2">
+                        <div>
+                            <ul>
+                                <li>Core ML models</li>
+                                <li>RAG implementation patterns</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul>
+                                <li>Educational frameworks</li>
+                                <li>API documentation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 20px; text-align: center;">
+                    <h3>Target: <span style="color: #667eea;">500+ users by Q2 2025</span></h3>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">23</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 24: Key Takeaways -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Key Takeaways</h1>
+                <p class="subtitle">Why FynVerse Matters</p>
+            </div>
+            <div class="content">
+                <ul style="font-size: 1.1em;">
+                    <li style="padding: 15px 0 15px 40px;"><span class="checkmark">✓</span> <strong>First Integrated Platform</strong> for Indian markets combining simulation, ML, and conversational AI</li>
+                    <li style="padding: 15px 0 15px 40px;"><span class="checkmark">✓</span> <strong>Validated Educational Impact:</strong> +19.8% portfolio quality improvement (p&lt;0.001, large effect)</li>
+                    <li style="padding: 15px 0 15px 40px;"><span class="checkmark">✓</span> <strong>Production-Ready Performance:</strong> 99.8% availability, &lt;200ms responses, 92% test coverage</li>
+                    <li style="padding: 15px 0 15px 40px;"><span class="checkmark">✓</span> <strong>Responsible AI Design:</strong> Transparency, user control, privacy protection, educational focus</li>
+                    <li style="padding: 15px 0 15px 40px;"><span class="checkmark">✓</span> <strong>Personalized Learning:</strong> RAG assistant with 94% relevance, 87% satisfaction</li>
+                    <li style="padding: 15px 0 15px 40px;"><span class="checkmark">✓</span> <strong>Scalable Architecture:</strong> Handles 100+ concurrent users, modular design</li>
+                    <li style="padding: 15px 0 15px 40px;"><span class="checkmark">✓</span> <strong>Sector-Aware Analytics:</strong> Context-appropriate valuation for Indian growth markets</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">24</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 25: Conclusions -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Conclusions</h1>
+                <p class="subtitle">Demonstrated Success</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>System Achievement</h3>
+                        <ul>
+                            <li>2,151 NSE stocks with <strong>99.8% availability</strong></li>
+                            <li><strong>&lt;200ms</strong> API performance</li>
+                            <li><strong>92%</strong> iOS test coverage</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Educational Validation</h3>
+                        <ul>
+                            <li>Portfolio quality: <strong>+19.8%</strong> (p&lt;0.001, Cohen's d=1.28)</li>
+                            <li>Outperforms control by <strong>14.4 points</strong> (p=0.002)</li>
+                            <li>Sector diversification: <strong>-44.7%</strong></li>
+                            <li>Investment confidence: <strong>+70.8%</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h3>Research Contributions</h3>
+                    <div class="grid-2">
+                        <div>
+                            <ul>
+                                <li>First integrated Indian market trading simulator</li>
+                                <li>RAG-based portfolio-aware conversational AI</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul>
+                                <li>Sector-adjusted automated scoring</li>
+                                <li>Validated responsible AI framework</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 20px;">
+                    <h3 style="text-align: center; color: #667eea;">Impact</h3>
+                    <p style="text-align: center; font-size: 1.2em;">Accessible intelligent portfolio education for emerging market retail investors</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">25</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 26: Acknowledgments -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1>Acknowledgments</h1>
+            </div>
+            <div class="content">
+                <div class="card">
+                    <h3>Research Guidance</h3>
+                    <p><strong>Dr. B. V. Satish Babu</strong> - VIT-AP University</p>
+                </div>
+                <div class="card">
+                    <h3>Participants</h3>
+                    <p>25 VIT-AP students (informed consent)</p>
+                </div>
+                <div class="card">
+                    <h3>Technical Support</h3>
+                    <ul>
+                        <li>Google Gemini API access</li>
+                        <li>VIT-AP School of Computer Science and Engineering</li>
+                        <li>Computational resources and infrastructure</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <h3>Compliance</h3>
+                    <p style="text-align: center;">Institutional IRB guidelines for human subjects research</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">26</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Slide 27: Thank You -->
+        <div class="slide">
+            <div class="slide-header">
+                <h1 style="text-align: center; font-size: 3em;">Thank You!</h1>
+                <p class="subtitle" style="text-align: center; font-size: 1.5em;">Questions?</p>
+            </div>
+            <div class="content">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Contact</h3>
+                        <p><strong>Zubair Ahmed Mohammad</strong></p>
+                        <p style="font-size: 0.9em;">zubairahmed20050831@gmail.com</p>
+                        <p><strong>Dr. B. V. Satish Babu</strong></p>
+                        <p style="font-size: 0.9em;">satishbabu.bv@vitap.ac.in</p>
+                        <p><strong>Kolli Jagan Mohan Rao</strong></p>
+                        <p style="font-size: 0.9em;">jagankolli2004@gmail.com</p>
+                    </div>
+                    <div class="card">
+                        <h3>Resources</h3>
+                        <ul>
+                            <li>FynVerse Research Paper</li>
+                            <li>Mohammad [SSRN 5411683]</li>
+                            <li>FynVerse iOS Application</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 40px;">
+                    <h3 style="text-align: center;">VIT-AP University</h3>
+                    <p style="text-align: center;">School of Computer Science and Engineering (SCOPE)</p>
+                    <p style="text-align: center;">Amaravathi, Andhra Pradesh, India</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+                <span class="slide-counter"><span id="currentSlide">27</span> / 27</span>
+                <button class="nav-btn" onclick="nextSlide()" disabled>Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            // Update all slide counters
+            document.querySelectorAll('#currentSlide').forEach(el => {
+                el.textContent = currentSlide + 1;
+            });
+
+            // Update buttons
+            document.querySelectorAll('#prevBtn').forEach(btn => {
+                btn.disabled = currentSlide === 0;
+            });
+            document.querySelectorAll('#nextBtn').forEach(btn => {
+                btn.disabled = currentSlide === totalSlides - 1;
+            });
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Scroll content to top
+            const activeSlide = slides[currentSlide];
+            const content = activeSlide.querySelector('.content');
+            if (content) {
+                content.scrollTop = 0;
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
