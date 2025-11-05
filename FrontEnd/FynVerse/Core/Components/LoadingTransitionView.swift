@@ -4,10 +4,11 @@ struct LoadingTransitionView: View {
     @State private var isActive = false
     @ObservedObject var authvm: AuthViewModel
     @ObservedObject var Pvm: PortfolioViewModel
+    @ObservedObject var tvm:  TransactionViewModel
     
     var body: some View {
         if isActive {
-            MainTabView( authvm: authvm, Pvm: Pvm) // Your main app view
+            MainTabView( authvm: authvm, Pvm: Pvm, transactionVM: tvm) // Your main app view
         } else {
             VStack {
                 Spacer()

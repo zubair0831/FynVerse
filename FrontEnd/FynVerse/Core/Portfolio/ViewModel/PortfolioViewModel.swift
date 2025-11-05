@@ -106,7 +106,7 @@ class PortfolioViewModel: ObservableObject {
     
     /// Fetches sector information for a stock symbol
     private func fetchSectorForStock(symbol: String) async -> String? {
-        let urlString = "http://localhost:8000/stock/\(symbol)/comprehensive"
+        let urlString = "http://192.168.1.9:8000/stock/\(symbol)/comprehensive"
         guard let url = URL(string: urlString) else { return nil }
         
         do {

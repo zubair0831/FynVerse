@@ -8,7 +8,7 @@ class NewsViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var hasError: Bool = false
     
-    private let baseURL = "http://localhost:8000"
+    private let baseURL = "http://192.168.1.9:8000"
     
     func fetchNews(symbol: String) async {
         isLoading = true

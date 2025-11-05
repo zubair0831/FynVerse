@@ -1,19 +1,34 @@
 import Foundation
 import SwiftUI
+import FirebaseFirestore
 
 @MainActor
 class PortfolioAnalyticsViewModel: ObservableObject {
     @Published var portfolioHistory: [PortfolioHistoryModel] = []
     @Published var chartDataPoints: [ChartDataPoint] = []
     @Published var sectorAllocations: [SectorAllocation] = []
+    @Published var portfolioRating: PortfolioAnalysisResponse?
     @Published var isLoadingHistory = false
     @Published var isLoadingSectors = false
+    @Published var isLoadingRating = false
+    @Published var isFetchingFreshData = false
     @Published var selectedTimeRange: TimeRange = .threeMonths
+    @Published var useMLAnalysis = true
+    @Published var analysisError: String?
+    @Published var lastAnalyticsUpdate: Date?
+    @Published var lastSectorUpdate: Date?
     
     private let historyService = PortfolioHistoryService()
+    private let ratingService = PortfolioRatingService()
     private let portfolioViewModel: PortfolioViewModel
     private let homeViewModel: HomeViewModel
     private let authViewModel: AuthViewModel
+    private let db = Firestore.firestore()
+    
+    // Cache for comprehensive stock data (symbol: sector)
+    private var sectorCache: [String: String] = [:]
+    // Full comprehensive data cache (symbol: StockComprehensiveModel)
+    private var comprehensiveCache: [String: StockComprehensiveModel] = [:]
     
     enum TimeRange: String, CaseIterable {
         case oneMonth = "1M"
@@ -28,7 +43,7 @@ class PortfolioAnalyticsViewModel: ObservableObject {
             case .threeMonths: return 90
             case .sixMonths: return 180
             case .oneYear: return 365
-            case .all: return 730 // 2 years max
+            case .all: return 730
             }
         }
     }
@@ -51,6 +66,7 @@ class PortfolioAnalyticsViewModel: ObservableObject {
                 portfolioValue: portfolioViewModel.portfolioValue,
                 totalGainLoss: portfolioViewModel.totalGainLoss
             )
+            print("✅ Daily snapshot saved")
         } catch {
             print("❌ Failed to save daily snapshot:", error)
         }
@@ -67,8 +83,10 @@ class PortfolioAnalyticsViewModel: ObservableObject {
                 days: selectedTimeRange.days
             )
             updateChartDataPoints()
+            print("✅ Portfolio history fetched: \(portfolioHistory.count) records")
         } catch {
             print("❌ Failed to fetch portfolio history:", error)
+            analysisError = "Failed to load portfolio history"
         }
         
         isLoadingHistory = false
@@ -83,33 +101,308 @@ class PortfolioAnalyticsViewModel: ObservableObject {
                 currentValue: history.portfolioValue,
                 gainLoss: history.totalGainLoss
             )
+        }.sorted { $0.date < $1.date }
+    }
+    
+    // MARK: - Comprehensive Data Caching (for Sectors)
+    
+    /// Load cached comprehensive data from Firestore
+    private func loadCachedComprehensiveData() async {
+        guard let userID = authViewModel.user?.userID else { return }
+        
+        do {
+            let docRef = db.collection("users").document(userID).collection("portfolioData").document("comprehensive")
+            let document = try await docRef.getDocument()
+            
+            guard document.exists, let data = document.data() else {
+                print("ℹ️ No cached comprehensive data found")
+                return
+            }
+            
+            if let stockDataArray = data["stocks"] as? [[String: Any]],
+               let timestamp = data["lastUpdated"] as? Timestamp {
+                
+                for stockData in stockDataArray {
+                    guard let symbol = stockData["symbol"] as? String,
+                          let jsonString = stockData["data"] as? String,
+                          let jsonData = jsonString.data(using: .utf8) else {
+                        continue
+                    }
+                    
+                    do {
+                        let comprehensive = try JSONDecoder().decode(StockComprehensiveModel.self, from: jsonData)
+                        comprehensiveCache[symbol] = comprehensive
+                        
+                        // Extract and cache sector
+                        if let sector = comprehensive.basic?.sector {
+                            sectorCache[symbol] = sector
+                        }
+                    } catch {
+                        print("⚠️ Failed to decode comprehensive data for \(symbol)")
+                    }
+                }
+                
+                lastSectorUpdate = timestamp.dateValue()
+                print("✅ Loaded \(comprehensiveCache.count) cached comprehensive entries from \(timestamp.dateValue())")
+            }
+            
+        } catch {
+            print("❌ Failed to load cached comprehensive data:", error.localizedDescription)
         }
     }
     
-    // MARK: - Sector Allocation Methods
+    /// Fetch and cache comprehensive data for all portfolio stocks
+    private func fetchAndCacheComprehensiveData() async {
+        guard let userID = authViewModel.user?.userID else { return }
+        
+        var updatedStocks: [[String: Any]] = []
+        var fetchedCount = 0
+        
+        print("🔄 Fetching comprehensive data for \(portfolioViewModel.portfolioStocks.count) stocks...")
+        
+        for stock in portfolioViewModel.portfolioStocks {
+            let symbol = stock.stockSymbol
+            
+            // Fetch comprehensive data
+            if let comprehensive = await fetchComprehensiveData(symbol: symbol) {
+                comprehensiveCache[symbol] = comprehensive
+                fetchedCount += 1
+                
+                // Extract sector
+                if let sector = comprehensive.basic?.sector {
+                    sectorCache[symbol] = sector
+                }
+                
+                // Serialize for caching
+                if let jsonData = try? JSONEncoder().encode(comprehensive),
+                   let jsonString = String(data: jsonData, encoding: .utf8) {
+                    updatedStocks.append([
+                        "symbol": symbol,
+                        "data": jsonString,
+                        "lastFetched": Timestamp(date: Date())
+                    ])
+                }
+            }
+        }
+        
+        // Save to Firestore
+        do {
+            let cacheData: [String: Any] = [
+                "stocks": updatedStocks,
+                "lastUpdated": Timestamp(date: Date())
+            ]
+            
+            let docRef = db.collection("users").document(userID).collection("portfolioData").document("comprehensive")
+            try await docRef.setData(cacheData)
+            
+            lastSectorUpdate = Date()
+            print("✅ Cached comprehensive data for \(fetchedCount) stocks")
+            
+        } catch {
+            print("❌ Failed to cache comprehensive data:", error.localizedDescription)
+        }
+    }
+    
+    /// Fetch comprehensive data for a single stock
+    private func fetchComprehensiveData(symbol: String) async -> StockComprehensiveModel? {
+        let urlString = "http://192.168.1.9:8000/stock/\(symbol)/comprehensive"
+        guard let url = URL(string: urlString) else { return nil }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(StockComprehensiveModel.self, from: data)
+            return response
+        } catch {
+            print("❌ Failed to fetch comprehensive data for \(symbol):", error)
+            return nil
+        }
+    }
+    
+    // MARK: - ML Portfolio Rating with Caching
+    
+    func fetchPortfolioRating(useML: Bool? = nil) async {
+        guard !portfolioViewModel.portfolioStocks.isEmpty else {
+            print("⚠️ No portfolio stocks to analyze")
+            analysisError = "No stocks in portfolio"
+            return
+        }
+        
+        // 1. Load cached rating first
+        await loadCachedPortfolioRating()
+        
+        // 2. Fetch fresh rating in background
+        isFetchingFreshData = true
+        isLoadingRating = true
+        analysisError = nil
+        
+        let shouldUseML = useML ?? self.useMLAnalysis
+        
+        do {
+            if shouldUseML {
+                print("🤖 Fetching ML-enhanced portfolio analysis...")
+                portfolioRating = try await ratingService.analyzePortfolioEnhanced(
+                    holdings: portfolioViewModel.portfolioStocks
+                )
+                print("✅ ML-enhanced portfolio rating fetched")
+                
+                if let mlInsights = portfolioRating?.mlInsights {
+                    print("📊 ML Risk Score: \(mlInsights.riskPrediction.mlRiskScore ?? 0)")
+                    print("📊 Confidence: \(mlInsights.riskPrediction.confidence)%")
+                    if mlInsights.anomalyDetection.isAnomaly {
+                        print("⚠️ Anomaly detected: \(mlInsights.anomalyDetection.warnings)")
+                    }
+                }
+            } else {
+                print("📊 Fetching standard portfolio analysis...")
+                portfolioRating = try await ratingService.analyzePortfolio(
+                    holdings: portfolioViewModel.portfolioStocks
+                )
+                print("✅ Standard portfolio rating fetched")
+            }
+            
+            lastAnalyticsUpdate = Date()
+            
+            // 3. Cache the fresh rating
+            await cachePortfolioRating()
+            
+        } catch {
+            print("❌ Failed to fetch portfolio rating:", error)
+            analysisError = error.localizedDescription
+            
+            if shouldUseML {
+                print("🔄 Attempting fallback to standard analysis...")
+                do {
+                    portfolioRating = try await ratingService.analyzePortfolio(
+                        holdings: portfolioViewModel.portfolioStocks
+                    )
+                    lastAnalyticsUpdate = Date()
+                    await cachePortfolioRating()
+                    print("✅ Fallback analysis successful")
+                } catch {
+                    print("❌ Fallback also failed:", error)
+                }
+            }
+        }
+        
+        isLoadingRating = false
+        isFetchingFreshData = false
+    }
+    
+    /// Load cached portfolio rating from Firestore
+    private func loadCachedPortfolioRating() async {
+        guard let userID = authViewModel.user?.userID else { return }
+        
+        do {
+            let docRef = db.collection("users").document(userID).collection("portfolioData").document("analytics")
+            let document = try await docRef.getDocument()
+            
+            guard document.exists, let data = document.data() else {
+                print("ℹ️ No cached portfolio rating found")
+                return
+            }
+            
+            if let ratingJSON = data["portfolioRating"] as? String,
+               let timestamp = data["lastUpdated"] as? Timestamp,
+               let jsonData = ratingJSON.data(using: .utf8) {
+                
+                do {
+                    let rating = try JSONDecoder().decode(PortfolioAnalysisResponse.self, from: jsonData)
+                    self.portfolioRating = rating
+                    self.lastAnalyticsUpdate = timestamp.dateValue()
+                    print("✅ Loaded cached portfolio rating from \(timestamp.dateValue())")
+                } catch {
+                    print("⚠️ Failed to decode cached rating:", error)
+                }
+            }
+            
+        } catch {
+            print("❌ Failed to load cached portfolio rating:", error.localizedDescription)
+        }
+    }
+    
+    /// Cache current portfolio rating to Firestore
+    private func cachePortfolioRating() async {
+        guard let userID = authViewModel.user?.userID,
+              let rating = portfolioRating else { return }
+        
+        do {
+            let encoder = JSONEncoder()
+            let jsonData = try encoder.encode(rating)
+            
+            guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+                print("❌ Failed to convert rating to JSON string")
+                return
+            }
+            
+            let cacheData: [String: Any] = [
+                "portfolioRating": jsonString,
+                "lastUpdated": Timestamp(date: Date()),
+                "useMLAnalysis": useMLAnalysis
+            ]
+            
+            let docRef = db.collection("users").document(userID).collection("portfolioData").document("analytics")
+            try await docRef.setData(cacheData)
+            
+            print("✅ Cached portfolio rating successfully")
+            
+        } catch {
+            print("❌ Failed to cache portfolio rating:", error.localizedDescription)
+        }
+    }
+    
+    func toggleMLAnalysis() async {
+        useMLAnalysis.toggle()
+        await fetchPortfolioRating(useML: useMLAnalysis)
+    }
+    
+    // MARK: - Sector Allocation with Caching
     
     func calculateSectorAllocations() async {
+        guard let userID = authViewModel.user?.userID else { return }
+        
+        // 1. Load cached comprehensive data first (for instant sectors)
+        await loadCachedComprehensiveData()
+        
+        // 2. Calculate with cached data if available
+        if !sectorCache.isEmpty {
+            calculateSectorsFromCache()
+        }
+        
+        // 3. Fetch fresh comprehensive data in background
+        isFetchingFreshData = true
         isLoadingSectors = true
         
+        await fetchAndCacheComprehensiveData()
+        
+        // 4. Recalculate with fresh data
+        calculateSectorsFromCache()
+        
+        isLoadingSectors = false
+        isFetchingFreshData = false
+    }
+    
+    /// Calculate sector allocations using cached comprehensive data
+    private func calculateSectorsFromCache() {
         var sectorMap: [String: (value: Double, stocks: [SectorStock])] = [:]
         let totalPortfolioValue = portfolioViewModel.portfolioValue
         
-        // Group stocks by sector
+        guard totalPortfolioValue > 0 else { return }
+        
         for portfolioStock in portfolioViewModel.portfolioStocks {
             guard let stockModel = homeViewModel.returnStockModel(symbol: portfolioStock.stockSymbol) else { continue }
             
-            // Fetch sector from API if not available in stockModel
-            let sector = await fetchSectorForStock(symbol: stockModel.SYMBOL) ?? "Unknown"
+            // Get sector from cache (instant!)
+            let sector = sectorCache[stockModel.SYMBOL] ?? "Unknown"
             
             let currentPrice = stockModel.Last_Price
             let holdingValue = currentPrice * Double(portfolioStock.quantity)
-            let percentage = (holdingValue / totalPortfolioValue) * 100
             
             let sectorStock = SectorStock(
                 symbol: stockModel.SYMBOL,
                 name: stockModel.NAME_OF_COMPANY,
                 value: holdingValue,
-                percentage: 0 // Will be calculated later within sector
+                percentage: 0
             )
             
             if var existingSector = sectorMap[sector] {
@@ -121,11 +414,9 @@ class PortfolioAnalyticsViewModel: ObservableObject {
             }
         }
         
-        // Convert to SectorAllocation array
         sectorAllocations = sectorMap.map { (sector, data) in
             let percentage = (data.value / totalPortfolioValue) * 100
             
-            // Calculate percentage within sector for each stock
             let updatedStocks = data.stocks.map { stock in
                 SectorStock(
                     symbol: stock.symbol,
@@ -144,31 +435,26 @@ class PortfolioAnalyticsViewModel: ObservableObject {
             )
         }.sorted { $0.value > $1.value }
         
-        isLoadingSectors = false
-    }
-    
-    private func fetchSectorForStock(symbol: String) async -> String? {
-        // Use the same API endpoint as DetailViewModel
-        let urlString = "http://localhost:8000/stock/\(symbol)/comprehensive"
-        guard let url = URL(string: urlString) else { return nil }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let decoder = JSONDecoder()
-            let response = try decoder.decode(StockComprehensiveModel.self, from: data)
-            return response.basic?.sector
-        } catch {
-            print("Failed to fetch sector for \(symbol):", error)
-            return nil
-        }
+        print("✅ Sector allocations calculated: \(sectorAllocations.count) sectors")
     }
     
     // MARK: - Helper Methods
     
     func refreshData() async {
-        await fetchPortfolioHistory()
-        await calculateSectorAllocations()
-        await saveDailySnapshot()
+        print("🔄 Refreshing all portfolio data...")
+        analysisError = nil
+        
+        async let historyTask: () = fetchPortfolioHistory()
+        async let sectorsTask: () = calculateSectorAllocations()
+        async let ratingTask: () = fetchPortfolioRating()
+        async let snapshotTask: () = saveDailySnapshot()
+        
+        await historyTask
+        await sectorsTask
+        await ratingTask
+        await snapshotTask
+        
+        print("✅ All data refreshed")
     }
     
     func changeTimeRange(_ newRange: TimeRange) async {
@@ -194,5 +480,32 @@ class PortfolioAnalyticsViewModel: ObservableObject {
         guard let first = chartDataPoints.first,
               first.investmentValue > 0 else { return 0 }
         return (periodGainLoss / first.investmentValue) * 100
+    }
+    
+    var hasMLPredictions: Bool {
+        portfolioRating?.hasMLPredictions ?? false
+    }
+    
+    var mlRiskLevel: String {
+        portfolioRating?.mlInsights?.riskPrediction.riskLevel ?? "Unknown"
+    }
+    
+    var hasAnomalies: Bool {
+        portfolioRating?.mlInsights?.anomalyDetection.isAnomaly ?? false
+    }
+    
+    var combinedRiskScore: Double {
+        portfolioRating?.combinedRiskScore ?? 0
+    }
+    
+    var warningCount: Int {
+        portfolioRating?.warningCount ?? 0
+    }
+    
+    var isShowingCachedData: Bool {
+        if let lastUpdate = lastAnalyticsUpdate {
+            return Date().timeIntervalSince(lastUpdate) > 300 // 5 minutes
+        }
+        return false
     }
 }

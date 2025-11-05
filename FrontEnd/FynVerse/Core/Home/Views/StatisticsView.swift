@@ -15,66 +15,81 @@ struct MarketIndex: Identifiable, Codable {
     }
 }
 
-
+// NOTE: StockModel, StatisticsModel, and AuthViewModel are assumed to exist in the consuming environment.
+// For demonstration, we will assume their existence and focus on the UI and data logic provided.
 
 struct CompactStatisticsView: View {
     let nifty50: StockModel?
     @State private var marketData: [MarketIndex] = []
     @State private var isLoading = false
     @State private var lastUpdated: Date = Date()
-    @ObservedObject var authvm: AuthViewModel
+    @ObservedObject var authvm: AuthViewModel // Assumed to be available
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // MARK: - Compact Header
+        VStack(alignment: .leading, spacing: 12) {
+            // MARK: - Header with Time
             HStack {
-                Text("Market Overview")
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                HStack(spacing: 6) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.caption)
+                        .foregroundStyle(Color.theme.accent)
+                    
+                    Text("Market Overview")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.theme.accent)
+                }
                 
                 Spacer()
                 
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     if isLoading {
                         ProgressView()
                             .scaleEffect(0.7)
+                            .tint(Color.theme.secondary)
                     }
+                    
+                    Image(systemName: "clock")
+                        .font(.caption2)
+                        .foregroundStyle(Color.theme.secondary)
                     
                     Text(lastUpdated, formatter: compactTimeFormatter)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(Color.theme.secondary)
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
             
-            // MARK: - Compact Horizontal Scroll
+            // MARK: - Enhanced Horizontal Scroll
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) { // Reduced spacing slightly
                     // Custom NIFTY 50 card if available
                     if let stock = nifty50 {
                         NavigationLink(destination: DetailView(stock: nifty50, DBStock: nil, authViewModel: authvm)) {
-                            CompactStatCardView(stat: StatisticsModel(
+                            EnhancedStatCardView(stat: StatisticsModel(
                                 title: stock.SYMBOL,
                                 value: stock.Last_Price.asNumberString(),
                                 percentChange: stock.Percent_Change
                             ))
                         }
+                        .buttonStyle(.plain)
                     }
                     
                     // Live market data cards
                     ForEach(marketData) { index in
-                        CompactMarketIndexCardView(marketIndex: index)
+                        EnhancedMarketIndexCardView(marketIndex: index)
                     }
                     
-                    // Compact refresh button
-                    CompactRefreshButtonView {
+                    // Enhanced refresh button
+                    EnhancedRefreshButtonView {
                         await fetchMarketData()
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 20)
             }
         }
-        .frame(maxHeight: 120) // Limit the height to ~10-15% of screen
+        .frame(maxHeight: 160) // Reduced Max Height for the whole section
         .task {
             await fetchMarketData()
         }
@@ -98,7 +113,7 @@ struct CompactStatisticsView: View {
     }
 }
 
-// MARK: - Compact Market Data Service
+// MARK: - Compact Market Data Service (No changes needed here)
 class CompactMarketDataService {
     private let baseURL = "https://query1.finance.yahoo.com/v8/finance/chart/"
     private let exchangeRates = ExchangeRateService()
@@ -110,14 +125,13 @@ class CompactMarketDataService {
             ("^IXIC", "NASDAQ", "USD"),
             ("^GSPC", "S&P 500", "USD"),
             ("^DJI", "DOW JONES", "USD"),
-            ("GC=F", "GOLD", "INR"), // Convert to INR
-            ("SI=F", "SILVER", "INR"), // Convert to INR
+            ("GC=F", "GOLD", "INR"),
+            ("SI=F", "SILVER", "INR"),
             ("CL=F", "CRUDE OIL", "USD"),
             ("BTC-USD", "BITCOIN", "USD"),
             ("ETH-USD", "ETHEREUM", "USD")
         ]
         
-        // Get USD to INR rate
         let usdToInr = await exchangeRates.getUSDToINRRate()
         
         var marketData: [MarketIndex] = []
@@ -152,27 +166,23 @@ class CompactMarketDataService {
                let result = chart["result"] as? [[String: Any]],
                let firstResult = result.first,
                let meta = firstResult["meta"] as? [String: Any],
-               let timestamps = firstResult["timestamp"] as? [Double],
+               let _ = firstResult["timestamp"] as? [Double],
                let indicators = firstResult["indicators"] as? [String: Any],
                let quote = indicators["quote"] as? [[String: Any]],
                let firstQuote = quote.first,
                let closes = firstQuote["close"] as? [Double?] {
                 
                 let currentPrice = meta["regularMarketPrice"] as? Double ?? 0.0
-                
-                // Get previous trading day's close price for proper calculation
                 var previousClose = meta["previousClose"] as? Double ?? 0.0
                 
-                // Find the most recent valid close price from historical data
                 let validCloses = Array(closes.compactMap({ $0 }).suffix(5))
                 if validCloses.count >= 2 {
-                    previousClose = validCloses[validCloses.count - 2] // Previous day's close
+                    previousClose = validCloses[validCloses.count - 2]
                 }
                 
                 let change = currentPrice - previousClose
                 let percentChange = previousClose != 0 ? (change / previousClose) * 100 : 0.0
                 
-                // Convert prices for gold and silver to INR
                 var finalPrice = currentPrice
                 var finalChange = change
                 if (symbol == "GC=F" || symbol == "SI=F") && currency == "INR" {
@@ -197,11 +207,11 @@ class CompactMarketDataService {
     }
 }
 
-// MARK: - Exchange Rate Service
+// MARK: - Exchange Rate Service (No changes needed here)
 class ExchangeRateService {
     func getUSDToINRRate() async -> Double {
         guard let url = URL(string: "https://query1.finance.yahoo.com/v8/finance/chart/USDINR=X?interval=1d&range=1d") else {
-            return 83.0 // Fallback rate
+            return 83.0
         }
         
         do {
@@ -219,55 +229,70 @@ class ExchangeRateService {
             print("Error fetching exchange rate: \(error)")
         }
         
-        return 83.0 // Fallback rate
+        return 83.0
     }
 }
 
-// MARK: - Compact Market Index Card View
-struct CompactMarketIndexCardView: View {
+// MARK: - Enhanced Market Index Card View (Smaller Frame, Adjusted Fonts)
+struct EnhancedMarketIndexCardView: View {
     let marketIndex: MarketIndex
     
-    private let cardGradient = LinearGradient(
-        colors: [Color(red: 0.1, green: 0.4, blue: 0.6), Color(red: 0.2, green: 0.6, blue: 0.8)],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
-    
-    private let lightGreen = Color(red: 0.2, green: 0.9, blue: 0.4)
-    private let lightRed = Color(red: 0.9, green: 0.3, blue: 0.3)
+    // Use vibrant gradient from theme
+    private var cardGradient: LinearGradient {
+        Color.theme.cardGradient1
+    }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(marketIndex.name)
-                .font(.caption2)
-                .foregroundStyle(.white.opacity(0.8))
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+        VStack(alignment: .leading, spacing: 8) {
+            // Header with icon
+            HStack {
+                Text(marketIndex.name)
+                    .font(.system(size: 12, weight: .semibold)) // Reduced font size
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                Image(systemName: getIconForIndex())
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.8))
+            }
             
+            Spacer()
+            
+            // Price
             Text(formatPrice())
-                .font(.subheadline)
-                .bold()
+                .font(.system(size: 18, weight: .bold)) // Reduced font size
                 .foregroundStyle(.white)
                 .lineLimit(1)
-                .minimumScaleFactor(0.9)
             
-            HStack(spacing: 2) {
-                Image(systemName: "triangle.fill")
+            // Change indicator - uses the now much brighter positive color
+            HStack(spacing: 4) {
+                Image(systemName: marketIndex.percentChange >= 0 ? "arrow.up.right" : "arrow.down.right")
                     .font(.caption2)
-                    .rotationEffect(.degrees(marketIndex.percentChange >= 0 ? 0 : 180))
+                    .fontWeight(.bold)
                 
                 Text(marketIndex.percentChange.asPercentString())
-                    .font(.caption2)
-                    .bold()
+                    .font(.system(size: 12, weight: .semibold))
             }
-            .foregroundStyle(marketIndex.percentChange >= 0 ? lightGreen : lightRed)
+            .foregroundStyle(marketIndex.percentChange >= 0 ? Color.theme.success : Color.theme.red)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(.white.opacity(0.75))
+            )
         }
-        .padding(10)
-        .frame(width: 120, height: 80, alignment: .leading)
+        .padding(14) // Reduced padding
+        .frame(width: 145, height: 110) // Reduced frame size
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 16) // Slightly smaller radius
                 .fill(cardGradient)
-                .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
+                .shadow(color: Color.theme.accent.opacity(0.4), radius: 8, x: 0, y: 4) // Reduced shadow
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.white.opacity(0.15), lineWidth: 1)
         )
     }
     
@@ -282,10 +307,22 @@ struct CompactMarketIndexCardView: View {
             return "\(currencySymbol)\(String(format: "%.2f", marketIndex.price))"
         }
     }
+    
+    private func getIconForIndex() -> String {
+        switch marketIndex.symbol {
+        case "^NSEI", "^BSESN": return "chart.bar.fill"
+        case "^IXIC", "^GSPC", "^DJI": return "globe.americas.fill"
+        case "GC=F": return "circle.fill"
+        case "SI=F": return "moon.fill"
+        case "CL=F": return "drop.fill"
+        case "BTC-USD", "ETH-USD": return "bitcoinsign.circle.fill"
+        default: return "chart.line.uptrend.xyaxis"
+        }
+    }
 }
 
-// MARK: - Compact Refresh Button
-struct CompactRefreshButtonView: View {
+// MARK: - Enhanced Refresh Button (Smaller Frame)
+struct EnhancedRefreshButtonView: View {
     let action: () async -> Void
     @State private var isRefreshing = false
     
@@ -294,85 +331,135 @@ struct CompactRefreshButtonView: View {
             Task {
                 isRefreshing = true
                 await action()
+                try? await Task.sleep(nanoseconds: 500_000_000)
                 isRefreshing = false
             }
         } label: {
-            VStack(spacing: 2) {
-                if isRefreshing {
-                    ProgressView()
-                        .tint(.white)
-                        .scaleEffect(0.8)
-                } else {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.subheadline)
-                        .foregroundStyle(.white)
+            VStack(spacing: 8) { // Reduced spacing
+                ZStack {
+                    Circle()
+                        .fill(.white.opacity(0.2)) // Slightly less opaque
+                        .frame(width: 40, height: 40) // Reduced size
+                    
+                    if isRefreshing {
+                        ProgressView()
+                            .tint(.white)
+                            .scaleEffect(0.9)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.body) // Reduced size
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                    }
                 }
                 
                 Text("Refresh")
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .font(.caption2) // Reduced font size
+                    .fontWeight(.medium)
+                    .foregroundStyle(.white)
             }
-            .padding(10)
-            .frame(width: 70, height: 80)
+            .padding(14) // Reduced padding
+            .frame(width: 95, height: 110) // Reduced frame size
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.gray.opacity(0.4))
-                    .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.theme.accent.opacity(0.7),
+                                Color.theme.accent.opacity(0.5)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(color: Color.theme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(.white.opacity(0.2), lineWidth: 1)
             )
         }
         .disabled(isRefreshing)
     }
 }
 
-// MARK: - Compact Stat Card View
-struct CompactStatCardView: View {
+// MARK: - Enhanced Stat Card View (NIFTY 50 - Smaller Frame, Adjusted Fonts)
+struct EnhancedStatCardView: View {
     let stat: StatisticsModel
     
-    private let lightGreen = Color(red: 0.2, green: 0.8, blue: 0.4)
-    private let lightRed = Color(red: 0.9, green: 0.3, blue: 0.3)
+    // Special gradient for NIFTY 50 - use the vibrant cardGradient2
+    private var cardGradient: LinearGradient {
+        Color.theme.cardGradient2
+    }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(stat.title)
-                .font(.caption2)
-                .foregroundColor(.white.opacity(0.9))
-                .lineLimit(1)
-            
-            Text("₹" + stat.value)
-                .font(.subheadline)
-                .bold()
-                .foregroundColor(.white)
-                .lineLimit(1)
-            
-            HStack(spacing: 2) {
-                Image(systemName: "triangle.fill")
-                    .font(.caption2)
-                    .rotationEffect(.degrees(stat.percentChange >= 0 ? 0 : 180))
-                Text(stat.percentChange.asPercentString())
-                    .font(.caption2)
-                    .bold()
+        VStack(alignment: .leading, spacing: 8) {
+            // Header
+            HStack {
+                ZStack {
+                    Circle()
+                        .fill(.white.opacity(0.25))
+                        .frame(width: 20, height: 20) // Reduced size
+                    
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 8)) // Reduced size
+                        .foregroundStyle(.yellow)
+                }
+                
+                Text(stat.title)
+                    .font(.system(size: 12, weight: .semibold)) // Reduced font size
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                Image(systemName: "chart.bar.fill")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.8))
             }
-            .foregroundColor(stat.percentChange >= 0 ? lightGreen : lightRed)
+            
+            Spacer()
+            
+            // Price
+            Text("₹" + stat.value)
+                .font(.system(size: 18, weight: .bold)) // Reduced font size
+                .foregroundStyle(.white)
+                .lineLimit(1)
+            
+            // Change indicator - uses the now much brighter positive color
+            HStack(spacing: 4) {
+                Image(systemName: stat.percentChange >= 0 ? "arrow.up.right" : "arrow.down.right")
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                
+                Text(stat.percentChange.asPercentString())
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(stat.percentChange >= 0 ? Color.theme.success : Color.theme.red)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(.white.opacity(0.25))
+            )
         }
-        .padding(8)
-        .frame(width: 110, height: 70, alignment: .leading)
+        .padding(14) // Reduced padding
+        .frame(width: 145, height: 110) // Reduced frame size
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(LinearGradient(
-                    colors: [Color.blue.opacity(0.8), Color.blue],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ))
+            RoundedRectangle(cornerRadius: 16)
+                .fill(cardGradient)
+                .shadow(color: Color.theme.success.opacity(0.4), radius: 8, x: 0, y: 4)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.white.opacity(0.15), lineWidth: 1)
         )
     }
 }
 
-
-
-// MARK: - Compact Date Formatter
+// MARK: - Compact Date Formatter (No changes needed here)
 private let compactTimeFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateFormat = "HH:mm"
     return formatter
 }()
-

@@ -9,7 +9,7 @@ class ProfileViewModel: ObservableObject {
     @Published var userFullName: String = "—"
     @Published var investingSince: String = "—"
     
-    private let authVM: AuthViewModel
+    let authVM: AuthViewModel
     private let trxnVM: TransactionViewModel
     
     init(authVM: AuthViewModel, trxnVM: TransactionViewModel) {

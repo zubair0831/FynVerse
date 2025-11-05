@@ -12,7 +12,7 @@ struct StockModel: Codable, Hashable, Identifiable {
     let Last_Price: Double
     let Previous_Close: Double
     let Volume: Int?
-    let MarketCap: Double
+    let MarketCap: Double?   // 👈 only this field is handled safely
     let P_L: Double
     let Percent_Change: Double
 
@@ -32,5 +32,32 @@ struct StockModel: Codable, Hashable, Identifiable {
         case P_L = "P&L"
         case Percent_Change = "Percent Change"
     }
-}
 
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        SYMBOL = try c.decode(String.self, forKey: .SYMBOL)
+        NAME_OF_COMPANY = try c.decode(String.self, forKey: .NAME_OF_COMPANY)
+        SERIES = try c.decode(String.self, forKey: .SERIES)
+        FACE_VALUE = try c.decode(Int.self, forKey: .FACE_VALUE)
+        YahooSymbol = try c.decode(String.self, forKey: .YahooSymbol)
+        Open = try? c.decode(Double.self, forKey: .Open)
+        High = try? c.decode(Double.self, forKey: .High)
+        Low = try? c.decode(Double.self, forKey: .Low)
+        Last_Price = try c.decode(Double.self, forKey: .Last_Price)
+        Previous_Close = try c.decode(Double.self, forKey: .Previous_Close)
+        Volume = try? c.decode(Int.self, forKey: .Volume)
+
+        // ✅ Safe MarketCap decoding (handles NA, -, null, or missing)
+        if let value = try? c.decode(Double.self, forKey: .MarketCap) {
+            MarketCap = value
+        } else if let str = try? c.decode(String.self, forKey: .MarketCap),
+                  let value = Double(str) {
+            MarketCap = value
+        } else {
+            MarketCap = nil
+        }
+
+        P_L = try c.decode(Double.self, forKey: .P_L)
+        Percent_Change = try c.decode(Double.self, forKey: .Percent_Change)
+    }
+}

@@ -8,6 +8,7 @@ struct SplashScreenView: View {
     @State private var footerOpacity: Double = 0.0
     @ObservedObject var vm:AuthViewModel
     @ObservedObject var Pvm:PortfolioViewModel
+    @ObservedObject var tvm:  TransactionViewModel
     var body: some View {
         ZStack {
             // Background Gradient for premium look
@@ -87,7 +88,7 @@ struct SplashScreenView: View {
             }
         }
         .fullScreenCover(isPresented: $isActive) {
-            MainTabView( authvm: vm, Pvm: Pvm)
+            MainTabView( authvm: vm, Pvm: Pvm, transactionVM: tvm)
         }
     }
 }

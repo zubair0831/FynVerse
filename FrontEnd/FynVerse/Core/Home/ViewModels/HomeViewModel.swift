@@ -31,14 +31,14 @@ class HomeViewModel: ObservableObject {
     func fetchStocks() async {
         let cached = StockCacheService.loadStocksFromCache()
         if !cached.isEmpty {
-            allStocks = cached.sorted { $0.MarketCap > $1.MarketCap }
+            allStocks = cached.sorted { ($0.MarketCap ?? 0) > ($1.MarketCap ?? 0) }
             applyFilters()
             print("✅ Showing cached stocks...")
         }
         
         let fetched = await manager.fetchStocks()
         if !fetched.isEmpty {
-            allStocks = fetched.sorted { $0.MarketCap > $1.MarketCap }
+            allStocks = fetched.sorted { ($0.MarketCap ?? 0) > ($1.MarketCap ?? 0) }
             StockCacheService.saveStocksToCache(fetched)
             print("✅ Stocks fetched from API.")
         }
@@ -126,7 +126,7 @@ class HomeViewModel: ObservableObject {
     
     // MARK: - Market Cap Filters
     func filterByMarketCap() {
-        let sortedStocks = allStocks.sorted { $0.MarketCap > $1.MarketCap }
+        let sortedStocks = allStocks.sorted { ($0.MarketCap ?? 0) > ($1.MarketCap ?? 0) }
         largeCapStocks = Array(sortedStocks.prefix(100))
         midCapStocks = Array(sortedStocks.dropFirst(100).prefix(250))
         smallCapStocks = Array(sortedStocks.dropFirst(350))

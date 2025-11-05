@@ -1,10 +1,3 @@
-//
-//  BuySellSheetViewModel.swift
-//  FynVerse
-//
-//  Created by zubair ahmed on 16/08/25.
-//
-
 import Foundation
 import SwiftUI
 
@@ -14,11 +7,13 @@ class BuySellSheetViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var showSuccessAlert: Bool = false
     @Published var showErrorAlert: Bool = false
+    @Published var showInsufficientFundsAlert: Bool = false
     @Published var errorMessage: String = ""
     
     let stock: StockModel
     let isBuying: Bool
     private let authViewModel: AuthViewModel
+    private let fundsManager = FundsManager.shared
 
     init(stock: StockModel, isBuying: Bool, authViewModel: AuthViewModel) {
         self.stock = stock
@@ -36,7 +31,25 @@ class BuySellSheetViewModel: ObservableObject {
     }
     
     var buttonText: String {
-        isLoading ? "Processing..." : (isBuying ? "Confirm Buy" : "Confirm Sell")
+        if isLoading {
+            return "Processing..."
+        } else if isBuying {
+            return hasInsufficientFunds ? "Insufficient Funds" : "Confirm Buy"
+        } else {
+            return "Confirm Sell"
+        }
+    }
+    
+    var hasInsufficientFunds: Bool {
+        isBuying && !fundsManager.canAfford(amount: totalAmount)
+    }
+    
+    var availableFunds: Double {
+        fundsManager.availableFunds
+    }
+    
+    var shortfall: Double {
+        max(0, totalAmount - availableFunds)
     }
 
     // MARK: - Action
@@ -47,6 +60,13 @@ class BuySellSheetViewModel: ObservableObject {
             showErrorAlert = true
             return
         }
+        
+        // Check funds before proceeding with buy order
+        if isBuying && hasInsufficientFunds {
+            showInsufficientFundsAlert = true
+            return
+        }
+        
         guard let userID = authViewModel.user?.userID else {
             errorMessage = "User not authenticated."
             showErrorAlert = true
@@ -76,5 +96,16 @@ class BuySellSheetViewModel: ObservableObject {
             showErrorAlert = true
         }
         isLoading = false
+    }
+    
+    // MARK: - Helper Methods
+    func formatCurrency(_ amount: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        formatter.locale = Locale(identifier: "en_IN")
+        
+        return formatter.string(from: NSNumber(value: amount)) ?? "0"
     }
 }

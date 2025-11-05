@@ -1,22 +1,18 @@
-//
-//  PortfolioAnalyticsView.swift
-//  FynVerse
-//
-//  Created by zubair ahmed on 08/09/25.
-//
-
 import SwiftUI
 
 struct PortfolioAnalyticsView: View {
     @StateObject private var analyticsVM: PortfolioAnalyticsViewModel
-    @State private var selectedTab: AnalyticsTab = .growth
-    
+    @State private var selectedTab: AnalyticsTab = .rating
+    @ObservedObject var authvm: AuthViewModel
+
     enum AnalyticsTab: String, CaseIterable {
+        case rating = "Rating"
         case growth = "Growth"
         case allocation = "Sectors"
         
         var icon: String {
             switch self {
+            case .rating: return "star.fill"
             case .growth: return "chart.line.uptrend.xyaxis"
             case .allocation: return "chart.pie"
             }
@@ -29,8 +25,9 @@ struct PortfolioAnalyticsView: View {
             homeViewModel: homeViewModel,
             authViewModel: authViewModel
         ))
+        self.authvm = authViewModel
     }
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -45,14 +42,17 @@ struct PortfolioAnalyticsView: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             switch selectedTab {
+                            case .rating:
+                                ratingTabContent
+                                
                             case .growth:
                                 PortfolioGrowthChartView(analyticsVM: analyticsVM)
                                 
                             case .allocation:
-                                SectorAllocationChartView(analyticsVM: analyticsVM)
+                                SectorAllocationChartView(analyticsVM: analyticsVM, authViewModel: authvm)
                             }
                             
-                            // Additional insights could go here
+                            // Additional insights for growth tab
                             if selectedTab == .growth && !analyticsVM.chartDataPoints.isEmpty {
                                 portfolioInsightsView
                             }
@@ -82,6 +82,90 @@ struct PortfolioAnalyticsView: View {
             await analyticsVM.refreshData()
         }
     }
+    
+    // MARK: - Rating Tab Content
+    
+    @ViewBuilder
+    private var ratingTabContent: some View {
+        if analyticsVM.isLoadingRating {
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .padding()
+                
+                Text("Analyzing your portfolio...")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 300)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.theme.cardBackground)
+            )
+        } else if let rating = analyticsVM.portfolioRating {
+            PortfolioRatingView(rating: rating)
+        } else {
+            emptyRatingView
+        }
+    }
+    
+    @ViewBuilder
+    private var emptyRatingView: some View {
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .fill(Color(.systemGray5))
+                    .frame(width: 120, height: 120)
+                
+                Image(systemName: "star.fill")
+                    .font(.system(size: 50))
+                    .foregroundColor(.gray)
+            }
+            
+            VStack(spacing: 8) {
+                Text("No Rating Available")
+                    .font(.title2.bold())
+                    .foregroundColor(.primary)
+                
+                Text("Add stocks to your portfolio to get\nan AI-powered rating and analysis")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+            
+            Button(action: {
+                Task {
+                    await analyticsVM.fetchPortfolioRating()
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.clockwise")
+                    Text("Refresh Rating")
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.blue)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 400)
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.theme.cardBackground)
+                .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
+        )
+    }
+    
+    // MARK: - Custom Tab Selector
     
     @ViewBuilder
     private var customTabSelector: some View {
@@ -113,11 +197,13 @@ struct PortfolioAnalyticsView: View {
         .padding(4)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6))
+                .fill(Color(.secondarySystemBackground))
         )
         .padding(.horizontal)
         .padding(.vertical, 8)
     }
+    
+    // MARK: - Portfolio Insights View
     
     @ViewBuilder
     private var portfolioInsightsView: some View {
@@ -130,28 +216,28 @@ struct PortfolioAnalyticsView: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 16) {
-                InsightCard(
+                PerformanceInsightCard(
                     title: "Best Day",
                     value: getBestDay(),
                     subtitle: "Highest single day gain",
                     color: .green
                 )
                 
-                InsightCard(
+                PerformanceInsightCard(
                     title: "Worst Day",
                     value: getWorstDay(),
                     subtitle: "Biggest single day loss",
                     color: .red
                 )
                 
-                InsightCard(
+                PerformanceInsightCard(
                     title: "Avg Daily Change",
                     value: getAverageDailyChange(),
                     subtitle: "Average daily movement",
                     color: .blue
                 )
                 
-                InsightCard(
+                PerformanceInsightCard(
                     title: "Volatility",
                     value: getVolatility(),
                     subtitle: "Portfolio volatility",
@@ -162,7 +248,7 @@ struct PortfolioAnalyticsView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
+                .fill(Color.theme.cardBackground)
                 .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
         )
     }
@@ -234,7 +320,8 @@ struct PortfolioAnalyticsView: View {
     }
 }
 
-struct InsightCard: View {
+// MARK: - Performance Insight Card (for Growth Tab)
+struct PerformanceInsightCard: View {
     let title: String
     let value: String
     let subtitle: String
@@ -266,8 +353,7 @@ struct InsightCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6))
+                .fill(Color(.secondarySystemBackground))
         )
     }
 }
-

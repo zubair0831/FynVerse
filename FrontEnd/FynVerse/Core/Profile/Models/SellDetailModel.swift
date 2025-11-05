@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SellDetail: Identifiable {
+struct SellDetail: Identifiable,Equatable{
     var id: String {
         txn.id ?? "\(txn.stockSymbol.lowercased())-\(Int(txn.timestamp.dateValue().timeIntervalSince1970))"
     }

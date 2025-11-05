@@ -88,7 +88,8 @@ struct PortfolioView: View {
         .padding(4)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6))
+                .fill(Color.theme.cardBackground)
+                .shadow(color: Color.theme.cardShadow, radius: 4, x: 0, y: 2)
         )
         .padding(.horizontal)
         .padding(.vertical, 8)
@@ -116,15 +117,28 @@ struct PortfolioView: View {
                 if !vm.portfolioStocks.isEmpty {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text("Your Holdings")
-                                .font(.title3.bold())
-                                .foregroundStyle(Color.theme.accent)
+                            HStack(spacing: 8) {
+                                Image(systemName: "briefcase.fill")
+                                    .foregroundStyle(Color.theme.accent)
+                                    .font(.title3)
+                                
+                                Text("Your Holdings")
+                                    .font(.title3.bold())
+                                    .foregroundStyle(Color.theme.accent)
+                            }
                             
                             Spacer()
                             
                             Text("\(vm.portfolioStocks.count) stock\(vm.portfolioStocks.count == 1 ? "" : "s")")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .fontWeight(.medium)
+                                .foregroundStyle(Color.theme.secondary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.theme.accent.opacity(0.1))
+                                )
                         }
                         .padding(.horizontal)
                         
@@ -149,37 +163,51 @@ struct PortfolioView: View {
     
     @ViewBuilder
     private var emptyPortfolioView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Image(systemName: "chart.pie")
-                .font(.system(size: 60))
-                .foregroundColor(.gray)
+                .font(.system(size: 70))
+                .foregroundStyle(Color.theme.accent.opacity(0.5))
+                .padding(.top, 20)
             
-            Text("Your Portfolio is Empty")
-                .font(.title2.bold())
-                .foregroundColor(.primary)
-            
-            Text("Start building your investment portfolio by purchasing your first stock")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
+            VStack(spacing: 8) {
+                Text("Your Portfolio is Empty")
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.theme.accent)
+                
+                Text("Start building your investment portfolio by purchasing your first stock")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.theme.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+            }
             
             NavigationLink(destination: HomeView(authvm: authvm)) {
-                Text("Explore Stocks")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.theme.accent)
-                    .cornerRadius(12)
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.headline)
+                    Text("Explore Stocks")
+                        .font(.headline)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.theme.accent)
+                        .shadow(color: Color.theme.accent.opacity(0.3), radius: 4, x: 0, y: 2)
+                )
             }
             .padding(.horizontal, 40)
             .padding(.top, 8)
+            .padding(.bottom, 20)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
+        .padding(.vertical, 30)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.theme.cardBackground)
+                .shadow(color: Color.theme.cardShadow, radius: 8, x: 0, y: 2)
+        )
         .padding(.horizontal)
     }
     
@@ -193,8 +221,10 @@ struct PortfolioView: View {
             QuickStatCard(
                 title: "Performance",
                 value: String(format: "%.2f%%", vm.portfolioPerformancePercentage),
-                color: vm.totalGainLoss >= 0 ? .green : .red,
-                icon: vm.totalGainLoss >= 0 ? "arrow.up.right" : "arrow.down.right"
+                subtitle: "Overall",
+                color: vm.totalGainLoss >= 0 ? Color.theme.success : Color.theme.red,
+                icon: vm.totalGainLoss >= 0 ? "arrow.up.right" : "arrow.down.right",
+                gradient: vm.totalGainLoss >= 0 ? Color.theme.cardGradient2 : Color.theme.cardGradient1
             )
             
             if let topHolding = vm.topHolding,
@@ -203,16 +233,18 @@ struct PortfolioView: View {
                     title: "Top Holding",
                     value: topHolding.stockSymbol,
                     subtitle: stockModel.Last_Price.asCurrencyWith2Decimals(),
-                    color: .blue,
-                    icon: "star.fill"
+                    color: Color.theme.info,
+                    icon: "star.fill",
+                    gradient: Color.theme.cardGradient1
                 )
             } else {
                 QuickStatCard(
                     title: "Diversification",
                     value: "\(vm.portfolioStocks.count)",
                     subtitle: "stocks",
-                    color: .purple,
-                    icon: "chart.bar.fill"
+                    color: Color.theme.accent,
+                    icon: "chart.bar.fill",
+                    gradient: Color.theme.cardGradient1
                 )
             }
             
@@ -223,15 +255,17 @@ struct PortfolioView: View {
                     title: "Top Gainer",
                     value: topGainer.stockSymbol,
                     subtitle: gainLoss >= 0 ? "+\(gainLoss.asCurrencyWith2Decimals())" : gainLoss.asCurrencyWith2Decimals(),
-                    color: gainLoss >= 0 ? .green : .red,
-                    icon: gainLoss >= 0 ? "arrow.up.circle.fill" : "arrow.down.circle.fill"
+                    color: gainLoss >= 0 ? Color.theme.success : Color.theme.red,
+                    icon: gainLoss >= 0 ? "arrow.up.circle.fill" : "arrow.down.circle.fill",
+                    gradient: gainLoss >= 0 ? Color.theme.cardGradient2 : nil
                 )
             } else {
                 QuickStatCard(
                     title: "Total Value",
                     value: vm.portfolioValue.asCurrencyWith2Decimals(),
-                    color: .orange,
-                    icon: "dollarsign.circle.fill"
+                    color: Color.theme.warning,
+                    icon: "dollarsign.circle.fill",
+                    gradient: nil
                 )
             }
         }
@@ -245,13 +279,20 @@ struct QuickStatCard: View {
     var subtitle: String = ""
     let color: Color
     let icon: String
+    var gradient: LinearGradient? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(color)
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.15))
+                        .frame(width: 28, height: 28)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(color)
+                }
                 
                 Spacer()
             }
@@ -265,21 +306,33 @@ struct QuickStatCard: View {
                 if !subtitle.isEmpty {
                     Text(subtitle)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.black)
                         .lineLimit(1)
                 }
             }
             
             Text(title)
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.secondary)
+                .foregroundColor(Color.black)
                 .lineLimit(1)
         }
-        .padding(12)
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6))
+            Group {
+                if let gradient = gradient {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(gradient)
+                        .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(.white.opacity(0.2), lineWidth: 1)
+                        )
+                } else {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.theme.cardBackground)
+                        .shadow(color: Color.theme.cardShadow, radius: 8, x: 0, y: 4)
+                }
+            }
         )
     }
 }
-

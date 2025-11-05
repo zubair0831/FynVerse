@@ -32,7 +32,7 @@ struct PnLReport: View {
                 if vm.sellDetails.isEmpty {
                     Spacer()
                     EmptyStateView(
-                        title: "No sales yet.",
+                          title: "No sales yet.",
                         subtitle: "Your realized PnL will appear here.",
                         systemImage: "chart.bar.doc.horizontal"
                     )

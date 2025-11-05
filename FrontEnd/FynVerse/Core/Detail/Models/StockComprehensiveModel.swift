@@ -7,6 +7,7 @@ struct StockComprehensiveModel: Codable {
     let valuation: ValuationMetrics?
     let financial: FinancialMetrics?
     let balanceSheet: BalanceSheetMetrics?
+    let shareholding: ShareholdingPattern?
 
     enum CodingKeys: String, CodingKey {
         case basic = "basic_info"
@@ -14,6 +15,7 @@ struct StockComprehensiveModel: Codable {
         case valuation = "valuation_metrics"
         case financial = "financial_metrics"
         case balanceSheet = "balance_sheet_metrics"
+        case shareholding = "shareholding_pattern"
     }
 }
 
@@ -185,20 +187,87 @@ struct BalanceSheetMetrics: Codable {
         self.bookValue = container.decodeDoubleFromStringIfNeeded(forKey: .bookValue)
     }
 }
+// MARK: - ShareholdingPattern
+struct ShareholdingPattern: Codable {
+    let sharesOutstanding: String?
+    let floatShares: String?
+    let sharesShort: String?
+    let heldPercentInsiders: String?
+    let heldPercentInstitutions: String?
+    let sharesPercentSharesOut: String?
+    let promoterHoldingPercent: String?
+    let publicHoldingPercent: String?
+    let fiiHoldingPercent: String?
+    let majorHoldersSummary: MajorHoldersSummary?
+    let institutionalHolders: InstitutionalHolders?
+
+    enum CodingKeys: String, CodingKey {
+        case sharesOutstanding = "shares_outstanding"
+        case floatShares = "float_shares"
+        case sharesShort = "shares_short"
+        case heldPercentInsiders = "held_percent_insiders"
+        case heldPercentInstitutions = "held_percent_institutions"
+        case sharesPercentSharesOut = "shares_percent_shares_out"
+        case promoterHoldingPercent = "promoter_holding_percent"
+        case publicHoldingPercent = "public_holding_percent"
+        case fiiHoldingPercent = "fii_holding_percent"
+        case majorHoldersSummary = "major_holders_summary"
+        case institutionalHolders = "institutional_holders"
+    }
+}
+
+// MARK: - MajorHoldersSummary
+struct MajorHoldersSummary: Codable {
+    let data: MajorHoldersData?
+    let lastUpdated: String?
+
+    enum CodingKeys: String, CodingKey {
+        case data
+        case lastUpdated = "last_updated"
+    }
+}
+
+struct MajorHoldersData: Codable {
+    let value: MajorHoldersValue?
+
+    enum CodingKeys: String, CodingKey {
+        case value = "Value"
+    }
+}
+
+struct MajorHoldersValue: Codable {
+    let insidersPercentHeld: Double?
+    let institutionsPercentHeld: Double?
+    let institutionsFloatPercentHeld: Double?
+    let institutionsCount: Int?
+}
+
+// MARK: - InstitutionalHolders
+struct InstitutionalHolders: Codable {
+    let data: [String: JSONAny]?   // <-- Flexible
+    let count: Int?
+    let lastUpdated: String?
+
+    enum CodingKeys: String, CodingKey {
+        case data
+        case count
+        case lastUpdated = "last_updated"
+    }
+}
 
 // MARK: - Decoding Helpers
 extension KeyedDecodingContainer {
-    func decodeDoubleFromStringIfNeeded(forKey key: KeyedDecodingContainer<K>.Key) -> Double? {
+    func decodeDoubleFromStringIfNeeded(forKey key: Key) -> Double? {
         if let doubleValue = try? decodeIfPresent(Double.self, forKey: key) {
             return doubleValue
         }
         if let stringValue = try? decodeIfPresent(String.self, forKey: key) {
-            return Double(stringValue)
+            return Double(stringValue) // handles both "5" and "0.52597"
         }
         return nil
     }
 
-    func decodeIntFromStringIfNeeded(forKey key: KeyedDecodingContainer<K>.Key) -> Int? {
+    func decodeIntFromStringIfNeeded(forKey key: Key) -> Int? {
         if let intValue = try? decodeIfPresent(Int.self, forKey: key) {
             return intValue
         }
@@ -206,5 +275,51 @@ extension KeyedDecodingContainer {
             return Int(stringValue)
         }
         return nil
+    }
+}
+// MARK: - JSONAny
+struct JSONAny: Codable {
+    let value: Any
+
+    init(_ value: Any) {
+        self.value = value
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let intVal = try? container.decode(Int.self) {
+            value = intVal
+        } else if let doubleVal = try? container.decode(Double.self) {
+            value = doubleVal
+        } else if let boolVal = try? container.decode(Bool.self) {
+            value = boolVal
+        } else if let stringVal = try? container.decode(String.self) {
+            value = stringVal
+        } else if let dictVal = try? container.decode([String: JSONAny].self) {
+            value = dictVal
+        } else if let arrayVal = try? container.decode([JSONAny].self) {
+            value = arrayVal
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "JSONAny decoding failed")
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        if let intVal = value as? Int {
+            try container.encode(intVal)
+        } else if let doubleVal = value as? Double {
+            try container.encode(doubleVal)
+        } else if let boolVal = value as? Bool {
+            try container.encode(boolVal)
+        } else if let stringVal = value as? String {
+            try container.encode(stringVal)
+        } else if let dictVal = value as? [String: JSONAny] {
+            try container.encode(dictVal)
+        } else if let arrayVal = value as? [JSONAny] {
+            try container.encode(arrayVal)
+        } else {
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: encoder.codingPath, debugDescription: "Invalid JSONAny value"))
+        }
     }
 }

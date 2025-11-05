@@ -15,7 +15,6 @@ class DetailViewModel: ObservableObject {
     @Published var isLoading = false
 
     @Published var stockComprehensive: StockComprehensiveModel?
-    @Published var predictionVM = StockPredictionViewModel()
 
     init(stock: StockModel?, DBStock: DBPortfolioStock?, authViewModel: AuthViewModel) {
         self.stock = stock
@@ -25,16 +24,11 @@ class DetailViewModel: ObservableObject {
 
     // MARK: - API Calls
     
-    func fetchPredictions() async {
-        guard let stock = stock else { return }
-        await predictionVM.fetchPredictions(for: stock.SYMBOL)
-    }
-
     func fetchStockDetails() async {
         guard let stock = stock else { return }
         
         self.isLoading = true
-        let urlString = "http://localhost:8000/stock/\(stock.SYMBOL)/comprehensive"
+        let urlString = "http://192.168.1.9:8000/stock/\(stock.SYMBOL)/comprehensive"
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
             self.isLoading = false
@@ -116,6 +110,16 @@ class DetailViewModel: ObservableObject {
             tuples.append(("Book Value", formatNumber(balanceSheet.bookValue, decimals: 2)))
         }
 
+        // Shareholding Pattern
+        if let shareholding = s.shareholding {
+            tuples.append(("Shares Outstanding", formatShares(shareholding.sharesOutstanding)))
+            tuples.append(("Float Shares", formatShares(shareholding.floatShares)))
+            tuples.append(("Promoter Holding", shareholding.promoterHoldingPercent ?? "N/A"))
+            tuples.append(("FII Holding", shareholding.fiiHoldingPercent ?? "N/A"))
+            tuples.append(("Public Holding", shareholding.publicHoldingPercent ?? "N/A"))
+            tuples.append(("Institutional Holding", shareholding.heldPercentInstitutions ?? "N/A"))
+        }
+
         return tuples
     }
 
@@ -160,5 +164,26 @@ class DetailViewModel: ObservableObject {
     private func formatInt(from value: String?) -> String {
         guard let value = value, let intValue = Int(value) else { return "N/A" }
         return NumberFormatter.localizedString(from: NSNumber(value: intValue), number: .decimal)
+    }
+    
+    private func formatShares(_ shares: String?) -> String {
+        guard let shares = shares, shares != "N/A", let sharesValue = Double(shares) else { return "N/A" }
+        
+        let crore: Double = 10_000_000
+        if sharesValue >= crore {
+            return String(format: "%.2f Cr", sharesValue / crore)
+        } else if sharesValue >= 1_000_000 {
+            return String(format: "%.2f M", sharesValue / 1_000_000)
+        } else if sharesValue >= 1_000 {
+            return String(format: "%.2f K", sharesValue / 1_000)
+        } else {
+            return String(format: "%.0f", sharesValue)
+        }
+    }
+    
+    private func extractPercentageFromString(_ string: String?) -> Double {
+        guard let string = string, string != "N/A" else { return 0 }
+        let cleanedString = string.replacingOccurrences(of: "%", with: "")
+        return Double(cleanedString) ?? 0
     }
 }
